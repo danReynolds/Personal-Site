@@ -1,8 +1,8 @@
 ---
 layout: post
 title: California for the Winter
-header: '/images/california/trip.jpg'
-header-text-color: 'light'
+image: '/images/california/trip.jpg'
+image-text-color: 'light'
 category: Tech
 tags: [trip, california]
 ---
@@ -10,6 +10,8 @@ tags: [trip, california]
 After 4 months in Palo Alto for work I have compiled some of my favorite photos from my stay there. Most weekends my roommates and I would check out some of the features of the area and each week I would use one of the images from that trip as my phone wallpaper.
 
 <!--halt-->
+
+# The Trip
 
 I've put these ones up at [Unsplash](https://unsplash.com/@danreynolds) and plan to add a few more once I sort through them all. Take a look and use them if you would like, I've got ones ranging from the Muir Woods to the Santa Cruz Pier, Yosemite Park, and Big Sur.
 

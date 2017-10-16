@@ -5,7 +5,7 @@ permalink:           pretty
 
 # Dependencies
 
-plugins: ['jekyll-paginate']
+plugins: ['jekyll-paginate', 'jekyll/tagging', 'jekyll-tagging-related_posts']
 
 # Setup
 title:               My Blog
@@ -35,6 +35,6 @@ defaults:
       path: ""
     values:
       layout: "default"
-      header-text: true
+      image-text: true
 
 disqus: danreynolds

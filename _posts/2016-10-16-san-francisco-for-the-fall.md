@@ -1,8 +1,8 @@
 ---
 layout: post
 title: San Francisco in the Fall
-header: '/images/california/fall.jpg'
-header-text-color: 'light'
+image: '/images/california/fall.jpg'
+image-text-color: 'light'
 category: Tech
 tags: [work, california]
 ---
@@ -10,6 +10,8 @@ tags: [work, california]
 I did not know whether I would be back in the United States so soon, but my internships have once again led me to the bay area, this time in the heart of San Francisco.
 
 <!--halt-->
+
+# Adapting to SF
 
 Living with three other roommates from back home, my friends and I found a place in Height-Ashbury, just east of the Golden Gate park. The majority of us are working on Market street and we're transiting to and from work. I have never lived in a major metropolis before and the city life is very different from both Waterloo and Palo Alto. The architecture, atmosphere and culture of the city often changes from street to street and it is a powerful experience to live in a city that is filled with such burgeoning wealth juxtaposed with the poverty of many parts of San Francisco.
 

@@ -56,8 +56,11 @@ h1, h2, h3, h4, h5, h6 {
   font-family: 'Fjalla One', sans-serif;
 }
 
-html {
-  font-family: 'Playfair Display', serif;
+body {
+  font-family: "Merriweather", serif;
+  letter-spacing: 0.01rem;
+  font-size: 0.9rem;
+  line-height: 1.75em;
 }
 
 .sidebar-item.title {

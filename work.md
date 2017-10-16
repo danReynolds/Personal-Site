@@ -4,16 +4,16 @@ title: Work
 ---
 
 ## NerdWallet
-August - Dec 2016
+July 2017 - present
 
-> Worked on a JavaScript and Python web application for managing conversations between financial advisors users of the Nerdwallet mobile app.
+> Engineer on the mobile product team designing NerdWallet's React Native personal finance application.
 
 ---
 
 ## NerdWallet
-July 2017 - present
+August - Dec 2016
 
-> Engineer on the mobile product team designing NerdWallet's React Native personal finance application.
+> Worked on a JavaScript and Python web application for managing conversations between financial advisors users of the Nerdwallet mobile app.
 
 ---
 

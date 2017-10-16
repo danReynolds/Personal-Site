@@ -3,10 +3,10 @@ layout: default
 ---
 
 <div
-  style='background-image: url({{ site.baseurl }}{{ page.header }})'
-  class='post-header {{ page.header-text-color }}'>
+  style='background-image: url({{ site.baseurl }}{{ page.image }})'
+  class='post-header {{ page.image-text-color }}'>
   <div class='container'>
-    {% if page.header-text %}
+    {% if page.image-text %}
       <h1 class='post-title'>{{ page.title }}</h1>
       <div class='date'>
         {{ page.date | date: '%B %e, %Y' }}

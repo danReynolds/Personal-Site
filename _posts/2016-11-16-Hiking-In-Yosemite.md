@@ -1,8 +1,8 @@
 ---
 layout: post
 title: Weekend in Yosemite Park
-header: '/images/california/yosemite.jpg'
-header-text-color: 'light'
+image: '/images/california/yosemite.jpg'
+image-text-color: 'light'
 category: Trip
 tags: [california, trip]
 ---

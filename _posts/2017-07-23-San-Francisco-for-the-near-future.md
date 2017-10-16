@@ -1,8 +1,8 @@
 ---
 layout: post
 title: Moving to San Francisco
-header: '/images/california/nerdwallet.jpg'
-header-text-color: 'light'
+image: '/images/california/nerdwallet.jpg'
+image-text-color: 'light'
 category: Tech
 tags: [work, california]
 ---

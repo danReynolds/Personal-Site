@@ -1,10 +1,10 @@
 ---
 layout: post
 title: A Guide for Building Bots with API.AI
-header: '/images/tech/api.jpg'
-header-text-color: 'light'
+image: '/images/tech/api.jpg'
+image-text-color: 'light'
 category: Tech
-tags: [bots, learn]
+tags: [project, bot, api.ai]
 ---
 
 The first part of a guide for building conversational bots using the free service provided by

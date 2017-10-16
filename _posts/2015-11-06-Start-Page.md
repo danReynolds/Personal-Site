@@ -1,15 +1,17 @@
 ---
 layout: post
 title: Private and Powerful Search Results
-header: '/images/tech/startpage.png'
-header-text: false
+image: '/images/tech/startpage.png'
+image-text: false
 category: Tech
-tags: [tools, learn]
+tags: [browser, showcase]
 ---
 
 There's usually a pretty big tradeoff when choosing between our search results accuracy and privacy. I've recently come across a new favourite solution.
 
 <!--halt-->
+
+## What to Look for
 
 When I'm looking for an answer to a specific programming question, I'm going to use Google. If I am concerned about privacy, I usually use DuckDuckGo. For anyone who doesn't know, DuckDuckGo is an alternative search engine that doesn't track your searches and is focused on maintaining user informational self-determination.
 
