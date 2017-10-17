@@ -65,7 +65,7 @@ Yarn on the other hand makes it clear that it uses checksums to determine the in
 
 Based on the speed and integrity differences between NPM and Yarn it looks like it was definitely a valuable addition to the lives of JavaScript developers.
 
-## Where NPM is Today
+# Where NPM is Today
 
 As I look to upgrade our version of Yarn I wanted to check the current state of NPM to determine if Yarn still makes a compelling argument for first-class performance and stability through deterministic dependency management.
 
