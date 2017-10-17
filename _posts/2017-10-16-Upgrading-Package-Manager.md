@@ -93,7 +93,7 @@ Using the latest npm version gave the following results (both NPM 5.1.1 and Yarn
 | ------------- |:---------------:| ------------:|
 | Yarn 1.2.1    | 437.24s         | 108.11s      |
 | NPM  3.10.10  | 279.57s         | 204.94s      |
-| NPM  5.1.1    | 107.62s         | 58.09        |
+| NPM  5.1.1    | 107.62s         | 58.09s        |
 
 That's a pretty incredible improvement compared to the old version of NPM and Yarn. Other people are not seeing such a noticeable speedup in [their tests](http://blog.scottlogic.com/2017/06/06/does-npm5-deprecate-yarn.html) but on our project on my machine there is a big change.
 
