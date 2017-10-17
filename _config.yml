@@ -5,7 +5,7 @@ permalink:           pretty
 
 # Dependencies
 
-plugins: ['jekyll-paginate', 'jekyll/tagging', 'jekyll-tagging-related_posts']
+plugins: ['jekyll-paginate', 'jekyll/tagging', 'jekyll-tagging-related_posts', 'jekyll/scholar']
 
 # Setup
 title:               My Blog
@@ -37,4 +37,5 @@ defaults:
       layout: "default"
       image-text: true
 
-disqus: danreynolds
+scholar:
+  style: ieee-with-url

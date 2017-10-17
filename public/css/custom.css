@@ -73,6 +73,6 @@ body {
   color: white;
 }
 
-.container.content p:first-child {
+.container.content > p:first-child {
   display: none;
 }
