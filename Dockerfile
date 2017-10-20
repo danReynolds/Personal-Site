@@ -12,4 +12,4 @@ RUN gem install bundler sshkit rake jekyll jekyll-sitemap pygments.rb redcarpet 
 ADD . /app
 
 # Start server
-CMD ["jekyll","serve", "--host", "0.0.0.0"]
+CMD JEKYLL_ENV=production bundle exec jekyll serve
