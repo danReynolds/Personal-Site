@@ -23,23 +23,16 @@ Theses lockfiles make sure that if you share your code with team members or depl
 to production, the packages your project depends on won't pull in breaking versions that
 authors have published since the time you first worked on and tested the code.
 
-While both package managers use lockfiles to determine your versions, but there are caveats.
+While both package managers use lockfiles to determine your versions, they do not behave exactly the same.
 
 # The Yarn.lock
 
-Yarn's lockfile implementation is marginally more liberal than npm. If you run `yarn` in a fresh
-repo with no lockfile and a `package.json` it will install your dependencies and
+If you run `yarn` in a fresh repo with no lockfile and a `package.json` it will install your dependencies and
 create a `yarn.lock`.
 
 The lockfile can be updated when you run `yarn add/upgrade/remove` as well as certains cases of `yarn install`. There has been debate around when the lockfile is actually changed on an install and I had initially thought that it could suck down newer versions of packages matching the semantic version range specified in the `package.json`, an issue brought up [here]*https://github.com/yarnpkg/yarn/issues/570#issuecomment-257136286). If this was the case then it defeats the purpose of a lockfile, as build servers and other developers could get different versions just by cloning a repo and running `yarn`.
 
 After investigating further though the times when the lockfile are actually updated was well cleared up.
-
-https://github.com/yarnpkg/yarn/issues/570#issuecomment-274638907
-
-Another solution would be to run `yarn install --frozen-lockfile` described in the [Yarn docs](https://yarnpkg.com/lang/en/docs/cli/install/). The frozen flag will not allow the the lockfile to change and instead the install command will **fail**.
-
-It could be frustrating to see builds fail because of frozen lockfile issues, but if that is happening too often and you don't want it to then that is a good indicator that the `package.json` should either use exact versions or be tested with the latest published versions of packages that match the version ranges before being deployed.
 
 Yarn member thejameskyle recommends that you consider Yarn dependency management to behave like a memoize function:
 
@@ -68,8 +61,6 @@ In her explanation she said the following:
 1. If you have a package.json and you run npm i we generate a package-lock.json from it.
 2. If you run npm i against that package.json and package-lock.json, the latter will never be updated, even if the package.json would be happy with newer versions.
 3. If you manually edit your package.json to have different ranges and run npm i and those ranges aren't compatible with your package-lock.json then the latter will be updated with version that are compatible with your package.json. Further runs of npm i will be as with 2 above.
-
-So npm will not install a new version of a package and update the lockfile even if it is the latest package in a compatible semantic range. The lockfile can still be modified by running `npm update` or when you change the `package.json` to an incompatible version and run `npm install`.
 
 Whereas changing a package in the `package.json` will always grab the latest compatible version under Yarn and update the lockfile, npm will keep the current version in the lockfile if it is still within the compatible range.
 
