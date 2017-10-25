@@ -68,4 +68,4 @@ Whereas changing a package in the `package.json` will always grab the latest com
 
 It wasn't always clear how Yarn and npm treat their dependency management and it took some digging to determine the actual behavior of each package manager.
 
-Hopefully this has made accomplishing either scenario a little clearer using either Yarn or npm.
+Hopefully this has made lockfile management a little clearer using either Yarn or npm.
