@@ -15,18 +15,20 @@ title: Home
 <div class="container content">
   <div class="posts">
     {% for post in paginator.posts %}
-    <div class='post'>
-      <a href="{{ site.baseurl }}{{ post.url }}">
-        <h1 class="post-title">
-            {{ post.title }}
-        </h1>
-        <div class='post-excerpt'>
-          <img src='{{ site.baseurl }}{{ post.image }}'>
-          {{ post.excerpt }}
-          <span class="post-date">{{ post.date | date_to_string }}</span>
+      {% unless post.layout == "presentation"%}
+        <div class='post'>
+          <a href="{{ site.baseurl }}{{ post.url }}">
+            <h1 class="post-title">
+                {{ post.title }}
+            </h1>
+            <div class='post-excerpt'>
+              <img src='{{ site.baseurl }}{{ post.image }}'>
+              {{ post.excerpt }}
+              <span class="post-date">{{ post.date | date_to_string }}</span>
+            </div>
+          </a>
         </div>
-      </a>
-    </div>
+      {% endunless %}
     {% endfor %}
   </div>
 

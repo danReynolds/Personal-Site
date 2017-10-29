@@ -32,7 +32,7 @@ create a `yarn.lock`.
 
 The lockfile can be updated when you run `yarn add/upgrade/remove` as well as certains cases of `yarn install`. There has been debate around when the lockfile is actually changed on an install and I had initially thought that it could suck down newer versions of packages matching the semantic version range specified in the `package.json`, an issue brought up [here]*https://github.com/yarnpkg/yarn/issues/570#issuecomment-257136286). If this was the case then it defeats the purpose of a lockfile, as build servers and other developers could get different versions just by cloning a repo and running `yarn`.
 
-After investigating further though the times when the lockfile are actually updated was well cleared up.
+After investigating further it became clear when Yarn actually updates the lockfile.
 
 Yarn member thejameskyle recommends that you consider Yarn dependency management to behave like a memoize function:
 

@@ -19,6 +19,18 @@ layout: default
   {{ content }}
   {% bibliography --cited %}
 
+  {% for post in site.posts %}
+    {% if post.title == page.title and post.layout != page.layout %}
+      <div class="slides">
+        <h1>Slides</h1>
+        <a href="{{ site.baseurl }}{{ post.url }}">
+          <p>This post is also available as slides. </p>
+        </a>
+        <br>
+      </div>
+    {% endif %}
+  {% endfor %}
+
   <div class="related">
     <h2>Related Posts</h2>
     <ul class="related-posts">
