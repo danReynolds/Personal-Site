@@ -90,7 +90,7 @@ So just because our sub-dependency was for `>= 14.0.0` does not mean that it wil
 
 Yarn has a hoister which hoists and resolves dependencies and is really composed of two parts:
 
-1. The **optimizer**, which runs during resolution and tries to resolve duplicate dependencies that have already been satisfied by previous resolution requests, but which has no real knowledge of parent/child dependency relationships. It does not know that the parent has a dependency of `^15.4.2` and the parent does not know the child has a dependency of `>= 14.0.0`.
+1. The **optimizer**, which runs during resolution and tries to resolve duplicate dependencies that have already been satisfied by previous resolution requests, but which has no real knowledge of parent/child dependency relationships. It does not know that the parent has a dependency of `15.6.1` and the parent does not know the child has a dependency of `>= 14.0.0`.
 
 2. The **hoister**, which runs once resolution and optimization has completed and merges dependencies that were resolved in the previous step of the *exact* same version, regardless of their original desired ranges.
 
