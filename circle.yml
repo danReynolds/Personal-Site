@@ -14,6 +14,7 @@ jobs:
             docker pull danreynolds/deploymanager:0.0.24
             if [ "${CIRCLE_BRANCH}" == "master" ]; then
               export DEPLOY_TAG="${CIRCLE_BUILD_NUM}_${CIRCLE_SHA1:0:7}"
+              touch .env
               ./deploymanager "rake secrets:decrypt"
               ./deploymanager "rake docker:build_deploy"
             fi
