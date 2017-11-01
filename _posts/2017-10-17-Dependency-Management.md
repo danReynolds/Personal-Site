@@ -38,7 +38,7 @@ Like I had talked about in a [previous post](https://danreynolds.ca/tech/2017/10
 
 The solution to our dependency problem could be achieved using either package manager, but it turns out that it had to be done in different ways.
 
-One of the repos that was using Yarn had this problem because a sub-dependency required React `>= 14.0.0`, and this caused the package to pull in React 16.0.0 even though it had a dev dependency of React `^15.4.2` explicitly in the root `package.json`.
+One of the repos that was using Yarn had this problem because a sub-dependency required React `>= 14.0.0`, and this caused the package to pull in React 16.0.0 even though it had a dev dependency of React `^15.6.1` explicitly in the root `package.json`.
 
 Running Yarn and looking in the `yarn.lock` it was clear that it had resolved two versions of React:
 
