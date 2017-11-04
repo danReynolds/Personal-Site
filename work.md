@@ -27,4 +27,4 @@ Jan - April 2016
 ## Boltmade
 2013 - 2015
 
-> Web developer developing Ruby on Rails applications for clients in the education, travel and telecommunications industries.
+> Web developer building Ruby on Rails applications for clients in the education, travel and telecommunications industries.
