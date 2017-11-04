@@ -13,7 +13,7 @@ July 2017 - present
 ## NerdWallet
 August - Dec 2016
 
-> Worked on a JavaScript and Python web application for managing conversations between financial advisors users of the Nerdwallet mobile app.
+> Worked on a JavaScript and Python web application for managing conversations between financial advisors and users of the Nerdwallet mobile app.
 
 ---
 
