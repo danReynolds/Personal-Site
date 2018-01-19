@@ -39,6 +39,9 @@ I found these charts from RxJS really helpful in understand Observables and thei
 among other producers/consumers:
 
 ![pushPull](/images/tech/push-pull.png)
+
+---
+
 ![pushPull](/images/tech/push-pull-definitions.png)
 
 We are generally more familiar with pulling values synchronously with functions and iterators.
@@ -238,6 +241,7 @@ Anywhere we want to dispatch a retriable action, call `retriableDispatch(dispatc
 ---
 
 ```javascript
+export const retriableDispatch = (dispatch, action, args = {}) => {
 export const retriableDispatch = (dispatch, action, args = {}) => {
   const retryAction = retriableAction(action, args);
   const failType = retryAction.failActionCreator().type;
