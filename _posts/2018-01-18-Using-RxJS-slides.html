@@ -9,6 +9,8 @@ tags: [Redux, RxJS]
 RxJS is well suited for handling retrying of requests and the Redux Observable middleware
 allows us to integrate it into our React-Redux application.
 
+---
+
 <!--halt-->
 
 # What is it?
@@ -231,7 +233,9 @@ for all of the supported utility methods. Check them out [here](http://reactivex
 # retriableDispatch
 
 Anywhere we want to dispatch a retriable action, call `retriableDispatch(dispatch, action()` instead. For example, we do
-`retriableDispatch(dispatch, requestFeatureFlags(true)` when the app starts up to retry important calls like to get feature flags.
+`retriableDispatch(dispatch, requestFeatureFlags(true)` when the app starts up to retry important calls like to get feature flags:
+
+---
 
 ```javascript
 export const retriableDispatch = (dispatch, action, args = {}) => {
