@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Using Redux Observable to Retry Requests
-image: '/images/tech/jest.png'.png'
+image: '/images/tech/react-rxjs.png'
 category: Tech
 tags: [Redux, RxJS]
 ---
