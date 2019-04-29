@@ -166,7 +166,7 @@ const pingEpic = action$ =>
 dispatch({ type: 'PING' });
 ```
 
-Our epic takes in a stream of actions and filters them to a certain type. It then maps it to an action of type `PONG` and fires that action, essentially eqiivalent to:
+Our epic takes in a stream of actions and filters them to a certain type. It then maps it to an action of type `PONG` and fires that action, essentially equivalent to:
 
 ```javascript
 dispatch({ type: 'PING' });
