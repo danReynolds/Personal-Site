@@ -53,7 +53,7 @@ We've made a basic state subscription.
 
 We have a number of use cases for monitoring changes to the Redux store in our applications and we want to apply our state subscription solution generically to all of them.
 
-One example is our React Native application's persistent storage. We have a need to persist specific parts of our Redux store across in order to deliver users a great experience on returning to the app. We can achieve this by monitoring for changes to our Redux state and sending them down to the native layer where they can be stored securely across app launches.
+One example is our React Native application's persistent storage. We have a need to persist specific parts of our Redux store across user sessions in order to deliver a great user experience on returning to the app. We can achieve this by monitoring for changes to our Redux state and sending them down to the native layer where they can be stored securely across app launches.
 
 The core requirements for this functionality would be that it is:
 
