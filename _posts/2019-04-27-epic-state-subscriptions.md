@@ -63,11 +63,11 @@ The core requirements for this functionality would be that it is:
 
 Asynchronous side effects? Ordered buffers? This sounds like a perfect application of Redux-Observable!
 
-If you are unfamiliar with Redux-Observable, it is a reactive programming library that applies the Observable pattern using RxJS to create Observable streams of actions. To learn more about it and Observables in general you can check out a [previous post]({% post_url 2018-01-18-Using-RxJS %}).
+If you are unfamiliar with Redux-Observable, it is a reactive programming library that applies the observable pattern using RxJS to create observable streams of actions. To learn more about it and observables in general you can check out a [previous post]({% post_url 2018-01-18-Using-RxJS %}).
 
 # Epic State Subscriptions
 
-The core primitive of Redux-Observable are Epics, functions which receive a stream of actions and returns a stream of actions. **Actions in**. **Actions out**.
+The core primitive of Redux-Observable are epics, functions which receive a stream of actions and returns a stream of actions. **Actions in**. **Actions out**.
 
 ![Redux Observable Process Diagram](/images/tech/redux-observable-process-diagram.png)
 
@@ -92,7 +92,7 @@ const persistenceEpic = (action$, state$) =>
   );
 ```
 
-The persistence Epic receives the mapped actions as a stream of path changes that we can then persist to the native layer. Epics satisfy our **asynchronous** requirement, as they run separately, after middlewares and reducers have processed the action. 
+The persistence epic receives the mapped actions as a stream of path changes that we can then persist to the native layer. Epics satisfy our **asynchronous** requirement, as they run separately, after middlewares and reducers have processed the action. 
 
 Each set of path changes emitted by the state subscription observable is mapped to a call to the native persistence module using the RxJS side effect `tap` operator.
 
