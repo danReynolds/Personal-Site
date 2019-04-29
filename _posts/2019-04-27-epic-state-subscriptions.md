@@ -71,7 +71,7 @@ The core primitive of Redux-Observable are epics, functions which receive a stre
 
 ![Redux Observable Process Diagram](/images/tech/redux-observable-process-diagram.png)
 
-All the state subscription needs to do is transform a stream of actions into a stream of path changes and then standard RxJS operators can do the rest. This functionality is available as its own RxJS operator supplied by our [Epic State Subscriptions](https://github.com/NerdWallet/epic-state-subscriptions) library.
+All the state subscription needs to do is transform a stream of actions into a stream of path changes and then standard RxJS operators can do the rest. This functionality is available as its own RxJS operator supplied by our [Epic State Subscriptions](https://github.com/NerdWalletOSS/epic-state-subscriptions) library.
 
 ```javascript
 import { ignoreElements, tap } from 'rxjs/operators';
@@ -161,7 +161,7 @@ We've now built a generic solution for subscribing to path changes we care about
 
 RxJS gives us the power to easily build on top of these path changes, incorporating complex operations like sequencing and buffering with only a few extra operators.
 
-You can [check out the library here](https://github.com/NerdWallet/epic-state-subscriptions) to see the full API and examples. That's all for now!
+You can [check out the library here](https://github.com/NerdWalletOSS/epic-state-subscriptions) to see the full API and examples. That's all for now!
 
 
 
