@@ -21,8 +21,8 @@ Let's say we have some valuable tool that we want to share with the larger commu
 It could look something like this:
 
 ```javascript
-// GeekPurse.js
-export default function GeekPurse(bankAccounts, creditCards) {
+// CreditCalculator.js
+export default function CreditCalculator(bankAccounts, creditCards) {
     this.creditCards = creditCards;
     this.bankAccounts = bankAccounts;
     this.creditCardAnalyzer = function creditCardAnalyzer() {
@@ -37,9 +37,9 @@ export default function GeekPurse(bankAccounts, creditCards) {
 });
 
 // client.js
-import GeekPurse from 'GeekPurse';
+import CreditCalculator from 'CreditCalculator';
 
-const creditCalculator = new GeekPurse(['Chase', 'Wells Fargo'], ['Visa', 'MasterCard']);
+const creditCalculator = new CreditCalculator(['Chase', 'Wells Fargo'], ['Visa', 'MasterCard']);
 creditCalculator.calculateScore(); // 701
 ```
 
@@ -54,7 +54,7 @@ But a little while later, we start getting interesting questions from consumers 
 Let's classify each of these problems:
 
 1. *What are these analyzer methods I see? Should I be using them?* - This an issue with establishing a **public** and **private** API.
-2. *How can I access the bank accounts it's using?* - This is an issue with **data access**.
+2. *How can I see which banks it is using in its calculation?* - This is an issue with **data access**.
 3. *How do I update the credit cards that I passed in?* - This is an issue with **data assignment and mutation**
 
 To answer the first question, we need to control what functionality we want to expose to the client. Currently, all of our internal properties are exposed, which makes it too easy for them to use the module incorrectly.
@@ -68,9 +68,9 @@ The first, and simplest thing we can do to differentiate our public and private 
 This is a common pattern in JS libraries, and is simple to do:
 
 ```javascript
-export default function GeekPurse(bankAccounts, creditCards) {
+export default function CreditCalculator(bankAccounts, creditCards) {
     this.creditCards = creditCards;
-    this.cbankAccounts = bankAccounts;
+    this.bankAccounts = bankAccounts;
     this._creditCardAnalyzer = function creditCardAnalyzer() {
         // Do math...
     }
@@ -83,60 +83,17 @@ export default function GeekPurse(bankAccounts, creditCards) {
 });
 ```
 
-* Pros: Simplicity
-* Cons: Still not actually prevent anything
-
 Some library maintainers find this, along with private or deprecated documentation using tools like [JSDoc](https://github.com/jsdoc/jsdoc) to be enough of a discouragement. They leave it up to consumers to know that when they use properties prefixed this way, they are risking breaking changes in future version and generally may encounter unexpected behaviour.
 
 If we instead want to go further and not only discourage but prevent them from accessing our private implementation, we can use the **module pattern**.
 
----
-
 ## Module Pattern
 
-The module pattern uses an Immediately-Invoked Function Expression (IFFE) function to take advantage of JS closures and expose only the methods that the library want to make available.
+The module pattern take advantages of JS closures to only expose the properties that the library wants to make available. This pattern allows us to use local variables that will not be exposed to consumers of the library but we can use as helpers to the private implementation. A function that is immediately executed like this is referred to as an Immediately-Invoked Function Expression (IFFE).
 
 ```javascript
-// GeekPurse.js
-export default (function GeekPurse() {
-    const calculateScore = function calculateScore() {
-       console.log(bankAccounts, creditCards)
-    }
-    let bankAccounts = [];
-    let creditCards = [];
-
-    return {
-        bankAccounts,
-        creditCards,
-        initialize: function initialize(initialBankAccounts, initialCreditCards) {
-            bankAccounts = initialBankAccounts;
-            creditCards = initialCreditCards;
-        },
-        calculateScore: function publicCalculateScore() {
-            return calculateScore();
-        },
-    };
-})();
-```
-
-And the client's usage now looks like this:
-
-```javascript
-// client.js
-import GeekPurse from 'GeekPurse';
-
-const creditCalculator = GeekPurse();
-creditCalculator.initialize(['Chase', 'Wells Fargo'], ['Visa', 'MasterCard']);
-creditCalculator.calculateScore(); // 701
-```
-
-* Pros: Hides internal implementations and only exposes what the libary owner intended to be public
-
-It would be nice to maintain our original pattern of using the `new` keyword, so instead we can tweak our initial module pattern:
-
-```javascript
-// GeekPurse.js
-export default (function GeekPurse() {
+// CreditCalculator.js
+export default (function CreditCalculator() {
     const calculateScore = function calculateScore() {
        console.log(bankAccounts, creditCards)
     }
@@ -159,23 +116,23 @@ export default (function GeekPurse() {
 
 ```javascript
 // client.js
-import GeekPurse from 'GeekPurse';
+import CreditCalculator from 'CreditCalculator';
 
-const creditCalculator = new GeekPurse(['Chase', 'Wells Fargo'], ['Visa', 'MasterCard']);
+const creditCalculator = new CreditCalculator(['Chase', 'Wells Fargo'], ['Visa', 'MasterCard']);
 creditCalculator.calculateScore(); // 701
 ```
 
 ## Data Access
 
-> How can I access the bank accounts it's using?
+> How can I see which banks it is using in its calculation?
 
-For that, we need need to determine our preferred pattern for data access. There are a couple options:
+There are different ways a library can choose to let clients access its public data.
 
-1. **Underscore prefixing**: We can follow the same pre-fixing practice for access to data properties.
+1. **Underscore prefixing**: We can follow the same pre-fixing practice for access to public vs private data properties.
 
     ```javascript
-    // GeekPurse.js
-    export default (function GeekPurse() {
+    // CreditCalculator.js
+    export default (function CreditCalculator() {
         const calculateScore = function calculateScore() {
         console.log(bankAccounts, creditCards)
         }
@@ -197,15 +154,15 @@ For that, we need need to determine our preferred pattern for data access. There
     ```
 
     * Pros: Simplicity
-    * Cons: Still not actually prevent anything
+    * Cons: Does not actually prevent access to private properties
 
     ---
 
 2. **Get methods**: If we want to limit our public API to not directly expose our internal properties, we could instead write a get-prefixed wrapper function.
 
     ```javascript
-    // GeekPurse.js
-    export default (function GeekPurse() {
+    // CreditCalculator.js
+    export default (function CreditCalculator() {
         const calculateScore = function calculateScore() {
         console.log(bankAccounts, creditCards)
         }
@@ -236,11 +193,11 @@ For that, we need need to determine our preferred pattern for data access. There
 
     ---
 
-3. **Property getters**: JS supports customizing properties of objects to restrict whether they can be altered or removed using the [defineProperty](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty) API.
+3. **Property getters**: JS supports customizing how properties can be accessed, modified and removed using the [defineProperty](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty) API.
 
     ```javascript
-    // GeekPurse.js
-    export default (function GeekPurse() {
+    // CreditCalculator.js
+    export default (function CreditCalculator() {
         const calculateScore = function calculateScore() {
         console.log(bankAccounts, creditCards)
         }
@@ -271,6 +228,8 @@ For that, we need need to determine our preferred pattern for data access. There
     })();
     ```
 
+    * Pros: Precise control over how properties can be accessed and changed
+
     In the first example with `bankAccounts`, we use the `get` attribute of `defineProperty` to specify what should happen when a user accesses the `bankAccounts` property. In this case we use our function to return the underlying `bankAccounts` list. Let's go through the three additional attributes, `configurable`, `enumerable` and `writable` **(CEW)**:
 
     1. **configurable**: Controls whether the attributes of the property can be re-defined, changed or deleted - by changed it doesn't mean that its *value* cannot be changed, that is dictated by the *writable* attribute. Instead it means whether you can re-define the property with `defineProperty` again and whether you could alter its original CEW definition. For our getter, since we don't want it to be modified in any of these ways by the client, we will set it to `false`.
@@ -288,9 +247,9 @@ For that, we need need to determine our preferred pattern for data access. There
 There are two scenarios to consider, a user could attempt to update their credit cards by assignment, by doing something like:
 
 ```javascript
-import GeekPurse from 'GeekPurse';
+import CreditCalculator from 'CreditCalculator';
 
-const creditCalculator = GeekPurse();
+const creditCalculator = CreditCalculator();
 creditCalculator.initialize(['Chase', 'Wells Fargo'], ['Visa', 'MasterCard']);
 creditCalculator.creditCards = ['Visa', 'Amex'];
 ```
@@ -298,20 +257,20 @@ creditCalculator.creditCards = ['Visa', 'Amex'];
 or they could try to update the data by mutating an existing object:
 
 ```javascript
-import GeekPurse from 'GeekPurse';
+import CreditCalculator from 'CreditCalculator';
 
-const creditCalculator = GeekPurse();
+const creditCalculator = CreditCalculator();
 creditCalculator.initialize(['Chase', 'Wells Fargo'], ['Visa', 'MasterCard']);
 creditCalculator.creditCards.push(['Amex'])
 ```
 
-First we will look at controlling **Data Assignment**:
+First, let's look into how we can control **Data Assignment**:
 
 1. **Set methods**: Similarly to a `get`-prefixed function, we could write a simple set wrapper function.
 
     ```javascript
-    // GeekPurse.js
-    export default (function GeekPurse() {
+    // CreditCalculator.js
+    export default (function CreditCalculator() {
         const calculateScore = function calculateScore() {
         console.log(bankAccounts, creditCards)
         }
@@ -337,11 +296,16 @@ First we will look at controlling **Data Assignment**:
     })();
     ```
 
+    * Pros: Prevents access/assignment to internal properties
+    * Cons: Once again makes clients access properties through functions
+
+    ---
+
 2. **Property setters**: the `defineProperty` API also allows us to define how to assign properties.
 
     ```javascript
-    // GeekPurse.js
-    export default (function GeekPurse() {
+    // CreditCalculator.js
+    export default (function CreditCalculator() {
         const calculateScore = function calculateScore() {
         console.log(bankAccounts, creditCards)
         }
@@ -379,15 +343,20 @@ First we will look at controlling **Data Assignment**:
     })();
     ```
 
-    We no longer specify the `writable` attribute, since it would conflict with the `set` attribute.
+    * Pros: Prevents access/assignment to internal properties
+    * Cons: Once again makes clients access properties through functions
+
+    ---
+
+    > Note: We no longer specify the `writable` attribute, since it would conflict with the `set` attribute.
 
 Next let's look at some options for controlling **Data Mutation**:
 
 1. **Spread Operator**: The spread operator `{...}`/`[...]` is a useful tool for making data immutable.
 
     ```javascript
-    // GeekPurse.js
-    export default (function GeekPurse() {
+    // CreditCalculator.js
+    export default (function CreditCalculator() {
         const calculateScore = function calculateScore() {
         console.log(bankAccounts, creditCards)
         }
@@ -425,13 +394,16 @@ Next let's look at some options for controlling **Data Mutation**:
     })();
     ```
 
-    Now if a client updates one of the objects we returned from our getter, it will have no effect on our internal values.
+    * Pros: Simple way to prevent mutation of internal properties
+    * Cons: Difficult to use for nested objects
+
+    ---
 
 2. **Cloning**: Libraries like Lodash have utilities for [cloning](https://lodash.com/docs/4.17.15#clone) objects.
 
     ```javascript
-    // GeekPurse.js
-    export default (function GeekPurse() {
+    // CreditCalculator.js
+    export default (function CreditCalculator() {
         const calculateScore = function calculateScore() {
         console.log(bankAccounts, creditCards)
         }
@@ -469,40 +441,37 @@ Next let's look at some options for controlling **Data Mutation**:
     })();
     ```
 
-    By returning a cloned object, we can similarly prevent clients from mutating internal objects.
+    * Pros: Internal objects are completely de-coupled from the client
+    * Cons: Has performance implications for large, frequently accessed objects
+
+    ---
 
 3. **Freezing**: The [Object.freeze](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/freeze) API can be used to prevent mutation of properties.
 
     ```javascript
-    // GeekPurse.js
-    export default (function GeekPurse() {
-        const calculateScore = function calculateScore() {
-        console.log(bankAccounts, creditCards)
-        }
-        let bankAccounts = Object.freeze([]);
-        let creditCards = [Object.freeze([]);
-
+    // CreditCalculator.js
+    export default (function CreditCalculator() {
         return function(initialBankAccounts, initialCreditCards) {
-            bankAccounts = initialBankAccounts;
-            creditCards = initialCreditCards;
+            bankAccounts = Object.freeze([...initialBankAccounts]);
+            creditCards = Object.freeze([...initialCreditCards]);
 
             Object.defineProperty(this, 'bankAccounts', {
                 enumerable: true,
                 get: function() {
-                    return [...bankAccounts];
+                    return bankAccounts;
                 },
                 set: function(newBankAccounts) {
-                    bankAccounts = Object.freeze(newBankAccounts);
+                    bankAccounts = Object.freeze([...newBankAccounts]);
                 }
             });
 
             Object.defineProperty(this, 'creditCards', {
                 enumerable: true,
                 get: function() {
-                    return [...creditCards];
+                    return creditCards;
                 },
                 set: function(newCreditCards) {
-                    creditCards = Object.freeze(newCreditCards);
+                    creditCards = Object.freeze([...newCreditCards]);
                 }
             });
 
@@ -515,18 +484,23 @@ Next let's look at some options for controlling **Data Mutation**:
 
     Freezing objects prevents adding, removing, writing or re-configuration of a properties CEW attributes. For an array like in our example, that means that mutative APIs like `Array.push` will not update the object.
 
+    * Pros: Referential equality maintained across accesses
+    * Cons: Prevents internal modification of objects
+
+    ---
+
 > Note: A gotcha with all of the above approaches is that they do not handle deeply nested objects. There are libraries that support [deep cloning](https://lodash.com/docs/4.17.15#cloneDeep) and [freezing](https://github.com/substack/deep-freeze) of objects.
 
 ## Putting it all together
 
 At this point we have demonstrated that JavaScript developers have a number of options for designing the different basic components of their libaries:
 
-| Component       | Pattern                                                   |
-|-----------------|-----------------------------------------------------------|
-| Public API      | underscore prefixing, module pattern                      |
-| Data Access     | underscore prefixing, get methods, getter properties      |
-| Data Assignment | underscore prefixing, set methods, setter properties      |
-| Data Mutation   | spread operator, cloning, freezing                        |
+| Component       | Pattern                                              |
+|-----------------|------------------------------------------------------|
+| Public API      | underscore prefixing, module pattern                 |
+| Data Access     | underscore prefixing, get methods, getter properties |
+| Data Assignment | underscore prefixing, set methods, setter properties |
+| Data Mutation   | spread operator, cloning, freezing                   | 
 
 We'll now see which options some popular libraries choose in their own implementations:
 
