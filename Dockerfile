@@ -1,5 +1,5 @@
 # Base Ruby layer
-FROM ruby:2.3.0
+FROM ruby:2.4.0
 
 # Set the working directory to /app
 RUN mkdir /app
