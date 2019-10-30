@@ -53,7 +53,7 @@ We've made a basic state subscription.
 
 We have a number of use cases for monitoring changes to the Redux store in our applications and we want to apply our state subscription solution generically to all of them.
 
-One example is our React Native application's persistent storage. We have a need to persist specific parts of our Redux store across in order to deliver users a great experience on returning to the app. We can achieve this by monitoring for changes to our Redux state and sending them down to the native layer where they can be stored securely across app launches.
+One example is our React Native application's persistent storage. We have a need to persist specific parts of our Redux store across user sessions in order to deliver a great user experience on returning to the app. We can achieve this by monitoring for changes to our Redux state and sending them down to the native layer where they can be stored securely across app launches.
 
 The core requirements for this functionality would be that it is:
 
@@ -63,15 +63,15 @@ The core requirements for this functionality would be that it is:
 
 Asynchronous side effects? Ordered buffers? This sounds like a perfect application of Redux-Observable!
 
-If you are unfamiliar with Redux-Observable, it is a reactive programming library that applies the Observable pattern using RxJS to create Observable streams of actions. To learn more about it and Observables in general you can check out a [previous post]({% post_url 2018-01-18-Using-RxJS %}).
+If you are unfamiliar with Redux-Observable, it is a reactive programming library that applies the observable pattern using RxJS to create observable streams of actions. To learn more about it and observables in general you can check out a [previous post]({% post_url 2018-01-18-Using-RxJS %}).
 
 # Epic State Subscriptions
 
-The core primitive of Redux-Observable are Epics, functions which receive a stream of actions and returns a stream of actions. **Actions in**. **Actions out**.
+The core primitive of Redux-Observable are epics, functions which receive a stream of actions and returns a stream of actions. **Actions in**. **Actions out**.
 
 ![Redux Observable Process Diagram](/images/tech/redux-observable-process-diagram.png)
 
-All the state subscription needs to do is transform a stream of actions into a stream of path changes and then standard RxJS operators can do the rest. This functionality is available as its own RxJS operator supplied by our [Epic State Subscriptions](https://github.com/NerdWallet/epic-state-subscriptions) library.
+All the state subscription needs to do is transform a stream of actions into a stream of path changes and then standard RxJS operators can do the rest. This functionality is available as its own RxJS operator supplied by our [Epic State Subscriptions](https://github.com/NerdWalletOSS/epic-state-subscriptions) library.
 
 ```javascript
 import { ignoreElements, tap } from 'rxjs/operators';
@@ -92,7 +92,7 @@ const persistenceEpic = (action$, state$) =>
   );
 ```
 
-The persistence Epic receives the mapped actions as a stream of path changes that we can then persist to the native layer. Epics satisfy our **asynchronous** requirement, as they run separately, after middlewares and reducers have processed the action. 
+The persistence epic receives the mapped actions as a stream of path changes that we can then persist to the native layer. Epics satisfy our **asynchronous** requirement, as they run separately, after middlewares and reducers have processed the action. 
 
 Each set of path changes emitted by the state subscription observable is mapped to a call to the native persistence module using the RxJS side effect `tap` operator.
 
@@ -161,7 +161,7 @@ We've now built a generic solution for subscribing to path changes we care about
 
 RxJS gives us the power to easily build on top of these path changes, incorporating complex operations like sequencing and buffering with only a few extra operators.
 
-You can [check out the library here](https://github.com/NerdWallet/epic-state-subscriptions) to see the full API and examples. That's all for now!
+You can [check out the library here](https://github.com/NerdWalletOSS/epic-state-subscriptions) to see the full API and examples. That's all for now!
 
 
 
