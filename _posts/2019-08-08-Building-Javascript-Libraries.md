@@ -711,7 +711,7 @@ render() {
 }
 ```
 
-Some of these properties are inherited from base JavaScript objects like `isPrototypeOf` or `toString`, but if we look at some of React's own properties like `isMounted` or `replaceState`, we'll notice that React made the decision to restrict access to those APIs by setting them to `enumerable: false` and we can see that's exactly what they did in [the source](https://github.com/facebook/react/blob/18d2e0c03e4496a824fdb7f89ea2a3d60c30d49a/packages/react/src/ReactBaseClasses.js#L118).
+Some of these properties are inherited from base JavaScript objects like `isPrototypeOf` or `toString`, but if we look at some of React's own properties like `isMounted` or `replaceState`, we'll notice that React made the decision to restrict access to those APIs by setting them to `enumerable: false` which you can see here in [the source](https://github.com/facebook/react/blob/18d2e0c03e4496a824fdb7f89ea2a3d60c30d49a/packages/react/src/ReactBaseClasses.js#L118).
 
 In this case, React did this because those APIs have since been deprecated.
 
@@ -865,7 +865,7 @@ This folder structure makes a lot of sense during development, but what what it 
 
 Let's take a moment to digest this code. The outer-most function is another immediately-invoked function expression **(IIFE)**. It is immediately called with a passed-in factory function that holds all a closure over all of the variables and functions that the library uses.
 
-For an ES6 import statement like `import moment from 'moment'`, what is exposed is the return value of the factory as an export: ` module.exports = factory()`.
+For an ES6 import statement like `import moment from 'moment'`, what is exposed is the return value of the factory as an export: `module.exports = factory()`.
 
 This return value is a function which has a number of public utilities on it, like `months`:
 
@@ -918,6 +918,8 @@ Putting it all together, Moment's API summary looks like this:
 | Data Access     | **underscore prefixing**, get methods, property getters        |
 | Data Assignment | underscore prefixing, set methods, setter properties           |
 | Data Mutation   | spread operator, cloning, freezing                             | 
+
+It is a clear example of a library that uses the module pattern to limit its API and chooses to rely on underscored properties to differentiate its underlying implementation.
 
 
 ## Building Your Own
