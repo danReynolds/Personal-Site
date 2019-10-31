@@ -572,7 +572,7 @@ this.state.newThing = "this is not a good idea...";
 this.state = "yea you shouldn't do this either...";
 ```
 
-The above lines do not immediately cause any errors, and do actually update the state property. However, since it was not done through `setState`, React will not know to re-render and since it is not an object, it will blow up at some later execution point.
+While this direction mutation will cause any immediate errors, since it was not done through `setState`, React will not know to re-render and since it is not an object, it will blow up at some later execution point.
 
 React has chosen in their API to not limit assignment and mutation in any way for its properties. Instead, it generally relies on convention, its comprehensive documentation and the downstream errors you will get if you were to make a change like this to keep developers in check.
 
@@ -722,7 +722,7 @@ render() {
 
 Some of these properties are inherited from base JavaScript objects like `isPrototypeOf` or `toString`, but if we look at some of React's own properties like `isMounted` or `replaceState`, we'll notice that React made the decision to restrict access to those APIs by setting them to `enumerable: false` which you can see here in [the source](https://github.com/facebook/react/blob/18d2e0c03e4496a824fdb7f89ea2a3d60c30d49a/packages/react/src/ReactBaseClasses.js#L118).
 
-In this case, React did this because those APIs have since been deprecated.
+As the documentation explains, React did this because those APIs have since been deprecated.
 
 Let's highlight how React chose to manage its API:
 
@@ -933,7 +933,7 @@ Putting it all together, Moment's API summary looks like this:
 It is a clear example of a library that uses the module pattern to limit its API and chooses to rely on underscored properties to differentiate its underlying implementation.
 
 
-## Building Your Own
+## Find What Works for You
 
 JavaScript and its ecosystem doesn't have just one right way to do something. The goal of this walk-through is to highlight some of the tools and patterns JavaScript developers have available to them for managing the way they can build their libaries.
 
