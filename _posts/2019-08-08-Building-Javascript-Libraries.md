@@ -34,6 +34,7 @@ export default function CreditCalculator(bankAccounts, creditCards) {
         // Do more math...
     }
     this.calculateScore = function calculateScore() {
+      // I'm sure it's just this simple...
       return this.creditCardAnalyzer() + this.bankAccountAnalyzer();
     }
 });
@@ -41,7 +42,7 @@ export default function CreditCalculator(bankAccounts, creditCards) {
 // client.js
 import CreditCalculator from 'CreditCalculator';
 const creditCalculator = new CreditCalculator(
-  ['Chase', 'Wells Fargo'], ['Visa', 'MasterCard'
+  ['Chase', 'Wells Fargo'], ['Visa', 'MasterCard']
 );
 creditCalculator.calculateScore(); // 800
 ```
