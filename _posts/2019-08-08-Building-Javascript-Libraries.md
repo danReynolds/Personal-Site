@@ -258,7 +258,10 @@ There are two scenarios to consider, a user could attempt to update their credit
 ```javascript
 import CreditCalculator from 'CreditCalculator';
 
-const creditCalculator = new CreditCalculator(['Chase', 'Wells Fargo'], ['Visa', 'MasterCard']);
+const creditCalculator = new CreditCalculator(
+  ['Chase', 'Wells Fargo'],
+  ['Visa', 'MasterCard']
+);
 creditCalculator.creditCards = ['Visa', 'Amex'];
 ```
 
@@ -267,7 +270,10 @@ or they could try to update the data by mutating an existing object:
 ```javascript
 import CreditCalculator from 'CreditCalculator';
 
-const creditCalculator = new CreditCalculator(['Chase', 'Wells Fargo'], ['Visa', 'MasterCard']);
+const creditCalculator = new CreditCalculator(
+  ['Chase', 'Wells Fargo'],
+  ['Visa', 'MasterCard']
+);
 creditCalculator.creditCards.push(['Amex'])
 ```
 
@@ -669,7 +675,8 @@ How many of these were intended to be exposed to us? We can check that with the 
 
 ```javascript
 const getAllPropertiesWithEnumerability = (obj) => { 
-  const props = new Set(Object.getOwnPropertyNames(obj).map(prop => `${prop}-${obj.propertyIsEnumerable(prop)}`));
+  const props = new Set(Object.getOwnPropertyNames(obj)
+    .map(prop => `${prop}-${obj.propertyIsEnumerable(prop)}`));
   const proto = Object.getPrototypeOf(obj);
   if (proto) {
     getAllPropertiesWithEnumerability(proto).forEach(prop => props.add(prop));
@@ -761,7 +768,7 @@ src/
         ...
 ```
 
-This folder structure makes a lot of sense during development, but what what it ends up exposing after it is processed for production is a variation of the module pattern we've looked at before. Here's a shortened of it straight from [the source](https://github.com/moment/moment/blob/96d0d6791ab495859d09a868803d31a55c917de1/moment.js) that highlights how it works:
+This folder structure makes a lot of sense during development, but what what it ends up exposing after it is processed for production is a variation of the module pattern we've looked at before. Here is a condensed version of it that highlights the pattern:
 
 ```javascript
 (function (global, factory) {
@@ -864,6 +871,8 @@ This folder structure makes a lot of sense during development, but what what it 
     return hooks;
 })));
 ```
+
+You can check out the full source [here](https://github.com/moment/moment/blob/96d0d6791ab495859d09a868803d31a55c917de1/moment.js).
 
 Let's take a moment to digest this code. The outer-most function is another immediately-invoked function expression **(IIFE)**. It is immediately called with a passed-in factory function that holds all a closure over all of the variables and functions that the library uses.
 
