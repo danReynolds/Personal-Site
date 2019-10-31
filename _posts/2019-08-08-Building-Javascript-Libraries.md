@@ -555,18 +555,20 @@ class EssayForm extends React.Component {
 
 Here they've defined a form with an editable text-area that a user can type in. If the user has typed something, it gets stored in the `state` data accessor on that component instance.
 
-The [React docs](https://reactjs.org/docs/state-and-lifecycle.html#do-not-modify-state-directly) make clear that this `state` is not to be mutated directly:
+The [React docs](https://reactjs.org/docs/state-and-lifecycle.html#do-not-modify-state-directly) make clear that `state` is not to be mutated directly:
 
 ![reactState](/images/tech/react-state.png)
 
-and as a React developer one of the first things you learn is to instead call the `setState` API to change your component's state. This is **not** enforced, however, by the library:
+As a React developer one of the first things you learn is to instead call the `setState` API to change your component's state. This is **not**, however, enforced by the library and the following lines will execute fine:
 
 ```javascript
 this.state.newThing = "this is not a good idea..."; 
 this.state = "yea you shouldn't do this either...";
 ```
 
-The above lines do not immediately cause any errors, and do actually update the state property. React has chosen in their API to not limit assignment and mutation in any way for its properties. Instead, it generally relies on convention, its comprehensive documentation and the downstream errors you will get if you were to make a change like this to a component's state to handle assignment and mutation in the library.
+The above lines do not immediately cause any errors, and do actually update the state property. However, since it was not done through `setState`, React will not know to re-render and since it is not an object, it will blow up at some later execution point.
+
+React has chosen in their API to not limit assignment and mutation in any way for its properties. Instead, it generally relies on convention, its comprehensive documentation and the downstream errors you will get if you were to make a change like this to keep developers in check.
 
 React **does** call out erroneous assignment at the end of the [componentWillMount](https://github.com/facebook/react/blob/1022ee0ec140b8fce47c43ec57ee4a9f80f42eca/packages/react-reconciler/src/ReactFiberClassComponent.js#L730) lifecycle event:
 
