@@ -572,7 +572,7 @@ this.state.newThing = "this is not a good idea...";
 this.state = "yea you shouldn't do this either...";
 ```
 
-While this direction mutation will cause any immediate errors, since it was not done through `setState`, React will not know to re-render and since it is not an object, it will blow up at some later execution point.
+While this direct assignment will not cause any immediate errors, since it was not done through `setState`, React will not know to re-render and since it is not an object, it will blow up at some later execution point.
 
 React has chosen in their API to not limit assignment and mutation in any way for its properties. Instead, it generally relies on convention, its comprehensive documentation and the downstream errors you will get if you were to make a change like this to keep developers in check.
 
