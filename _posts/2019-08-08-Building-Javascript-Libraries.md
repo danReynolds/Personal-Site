@@ -874,7 +874,7 @@ This folder structure makes a lot of sense during development, but what what it 
 
 You can check out the full source [here](https://github.com/moment/moment/blob/96d0d6791ab495859d09a868803d31a55c917de1/moment.js).
 
-Let's take a moment to digest this code. The outer-most function is another immediately-invoked function expression **(IIFE)**. It is immediately called with a passed-in factory function that holds all a closure over all of the variables and functions that the library uses.
+Let's take a moment to digest this code. The outer-most function is another immediately-invoked function expression **(IIFE)**. It is immediately called with a passed-in factory function that holds a closure over all of the variables and functions that the library uses.
 
 For an ES6 import statement like `import moment from 'moment'`, what is exposed is the return value of the factory as an export: `module.exports = factory()`.
 
@@ -935,7 +935,7 @@ It is a clear example of a library that uses the module pattern to limit its API
 
 ## Find What Works for You
 
-JavaScript and its ecosystem doesn't have just one right way to do something. The goal of this walk-through is to highlight some of the tools and patterns JavaScript developers have available to them for managing the way they can build their libaries.
+JavaScript and its ecosystem doesn't have just one right way to do something. The goal of this walk-through is to highlight some of the tools and patterns JavaScript developers have available to them for managing the way they build their libraries.
 
 The decisions a library owner makes in exposing their API and controlling access and mutation of its data can have profound impact on the usability, maintainability and ultimately the success of the library within teams, organizations and the larger community.
 
