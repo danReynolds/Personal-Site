@@ -130,7 +130,7 @@ const creditCalculator = new CreditCalculator(
 creditCalculator.calculateScore(); // 801
 ```
 
-A function that is immediately executed like this is referred to in JavaScript as an Immediately-Invoked Function Expression (IFFE).
+A function that is immediately executed like this is referred to in JavaScript as an Immediately-Invoked Function Expression (IIFE).
 
 ## Data Access
 
