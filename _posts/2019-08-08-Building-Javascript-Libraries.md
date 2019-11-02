@@ -495,7 +495,7 @@ Next let's look at some options for controlling **Data Mutation**:
     })();
     ```
 
-    Freezing objects prevents adding, removing, writing or re-configuration of a properties CEW attributes. For an array like in our example, that means that mutative APIs like `Array.push` will not update the object.
+    Freezing objects prevents adding, removing, writing or re-configuration of a property's CEW attributes. For an array like in our example, that means that mutative APIs like `Array.push` will not update the object.
 
     * Pros: Referential equality maintained across accesses
     * Cons: Prevents internal modification of objects (could also be a win depending on your opinions around data immutability)
