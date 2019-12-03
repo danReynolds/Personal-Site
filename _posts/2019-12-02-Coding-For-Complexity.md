@@ -381,9 +381,10 @@ const BankApplicationMachine = Machine(
         on: {
           SUBMIT: {
             target: 'DATE_OF_BIRTH',
-            actions: [
-              (context, { name }) => assign({ name }),
-            ],
+            actions: assign((context, { name }) => ({
+              ...context,
+              name,
+            }))
           }
         }
       },
@@ -392,9 +393,10 @@ const BankApplicationMachine = Machine(
         on: {
           SUBMIT: {
             target: 'SSN',
-            actions: [
-              (context, { dob }) => assign({ dob }),
-            ],
+            actions: [assign((context, { dob }) => ({
+              ...context,
+              dob,
+            }))]
           }
         },
       },
@@ -470,7 +472,7 @@ const BankApplicationManagerMachine = Machine({
         return {
           applications: {
             ...context.applications,
-            [event.name]: appliaction
+            [event.name]: application
           },
           activeApplication: application,
         };
@@ -522,8 +524,8 @@ const ApplicationManager = () => {
   );
 
   const renderApplicationPicker = useMemo(() => products.map(product => (
-    <a onClick={handleOpenApplication.bind(product)}>{product}<a/>
-  ), [products]);
+    <a onClick={() => handleOpenApplication(product.name)}>{product}<a/>
+  ), [handleOpenApplication]);
 
   return (
     <div>
