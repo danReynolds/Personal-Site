@@ -34,6 +34,7 @@ export default function CreditCalculator(bankAccounts, creditCards) {
         // Do more math...
     }
     this.calculateScore = function calculateScore() {
+      // I'm sure it's just this simple...
       return this.creditCardAnalyzer() + this.bankAccountAnalyzer();
     }
 });
@@ -41,7 +42,7 @@ export default function CreditCalculator(bankAccounts, creditCards) {
 // client.js
 import CreditCalculator from 'CreditCalculator';
 const creditCalculator = new CreditCalculator(
-  ['Chase', 'Wells Fargo'], ['Visa', 'MasterCard'
+  ['Chase', 'Wells Fargo'], ['Visa', 'MasterCard']
 );
 creditCalculator.calculateScore(); // 800
 ```
@@ -129,7 +130,7 @@ const creditCalculator = new CreditCalculator(
 creditCalculator.calculateScore(); // 801
 ```
 
-A function that is immediately executed like this is referred to in JavaScript as an Immediately-Invoked Function Expression (IFFE).
+A function that is immediately executed like this is referred to in JavaScript as an Immediately-Invoked Function Expression (IIFE).
 
 ## Data Access
 
@@ -258,7 +259,10 @@ There are two scenarios to consider, a user could attempt to update their credit
 ```javascript
 import CreditCalculator from 'CreditCalculator';
 
-const creditCalculator = new CreditCalculator(['Chase', 'Wells Fargo'], ['Visa', 'MasterCard']);
+const creditCalculator = new CreditCalculator(
+  ['Chase', 'Wells Fargo'],
+  ['Visa', 'MasterCard']
+);
 creditCalculator.creditCards = ['Visa', 'Amex'];
 ```
 
@@ -267,7 +271,10 @@ or they could try to update the data by mutating an existing object:
 ```javascript
 import CreditCalculator from 'CreditCalculator';
 
-const creditCalculator = new CreditCalculator(['Chase', 'Wells Fargo'], ['Visa', 'MasterCard']);
+const creditCalculator = new CreditCalculator(
+  ['Chase', 'Wells Fargo'],
+  ['Visa', 'MasterCard']
+);
 creditCalculator.creditCards.push(['Amex'])
 ```
 
@@ -488,7 +495,7 @@ Next let's look at some options for controlling **Data Mutation**:
     })();
     ```
 
-    Freezing objects prevents adding, removing, writing or re-configuration of a properties CEW attributes. For an array like in our example, that means that mutative APIs like `Array.push` will not update the object.
+    Freezing objects prevents adding, removing, writing or re-configuration of a property's CEW attributes. For an array like in our example, that means that mutative APIs like `Array.push` will not update the object.
 
     * Pros: Referential equality maintained across accesses
     * Cons: Prevents internal modification of objects (could also be a win depending on your opinions around data immutability)
@@ -555,18 +562,20 @@ class EssayForm extends React.Component {
 
 Here they've defined a form with an editable text-area that a user can type in. If the user has typed something, it gets stored in the `state` data accessor on that component instance.
 
-The [React docs](https://reactjs.org/docs/state-and-lifecycle.html#do-not-modify-state-directly) make clear that this `state` is not to be mutated directly:
+The [React docs](https://reactjs.org/docs/state-and-lifecycle.html#do-not-modify-state-directly) make clear that `state` is not to be mutated directly:
 
 ![reactState](/images/tech/react-state.png)
 
-and as a React developer one of the first things you learn is to instead call the `setState` API to change your component's state. This is **not** enforced, however, by the library:
+As a React developer one of the first things you learn is to instead call the `setState` API to change your component's state. This is **not**, however, enforced by the library and the following lines will execute fine:
 
 ```javascript
 this.state.newThing = "this is not a good idea..."; 
 this.state = "yea you shouldn't do this either...";
 ```
 
-The above lines do not immediately cause any errors, and do actually update the state property. React has chosen in their API to not limit assignment and mutation in any way for its properties. Instead, it generally relies on convention, its comprehensive documentation and the downstream errors you will get if you were to make a change like this to a component's state to handle assignment and mutation in the library.
+While this direct assignment will not cause any immediate errors, since it was not done through `setState`, React will not know to re-render and since it is not an object, it will blow up at some later execution point.
+
+React has chosen in their API to not limit assignment and mutation in any way for its properties. Instead, it generally relies on convention, its comprehensive documentation and the downstream errors you will get if you were to make a change like this to keep developers in check.
 
 React **does** call out erroneous assignment at the end of the [componentWillMount](https://github.com/facebook/react/blob/1022ee0ec140b8fce47c43ec57ee4a9f80f42eca/packages/react-reconciler/src/ReactFiberClassComponent.js#L730) lifecycle event:
 
@@ -667,7 +676,8 @@ How many of these were intended to be exposed to us? We can check that with the 
 
 ```javascript
 const getAllPropertiesWithEnumerability = (obj) => { 
-  const props = new Set(Object.getOwnPropertyNames(obj).map(prop => `${prop}-${obj.propertyIsEnumerable(prop)}`));
+  const props = new Set(Object.getOwnPropertyNames(obj)
+    .map(prop => `${prop}-${obj.propertyIsEnumerable(prop)}`));
   const proto = Object.getPrototypeOf(obj);
   if (proto) {
     getAllPropertiesWithEnumerability(proto).forEach(prop => props.add(prop));
@@ -713,7 +723,7 @@ render() {
 
 Some of these properties are inherited from base JavaScript objects like `isPrototypeOf` or `toString`, but if we look at some of React's own properties like `isMounted` or `replaceState`, we'll notice that React made the decision to restrict access to those APIs by setting them to `enumerable: false` which you can see here in [the source](https://github.com/facebook/react/blob/18d2e0c03e4496a824fdb7f89ea2a3d60c30d49a/packages/react/src/ReactBaseClasses.js#L118).
 
-In this case, React did this because those APIs have since been deprecated.
+As the documentation explains, React did this because those APIs have since been deprecated.
 
 Let's highlight how React chose to manage its API:
 
@@ -759,7 +769,7 @@ src/
         ...
 ```
 
-This folder structure makes a lot of sense during development, but what what it ends up exposing after it is processed for production is a variation of the module pattern we've looked at before. Here's a shortened of it straight from [the source](https://github.com/moment/moment/blob/96d0d6791ab495859d09a868803d31a55c917de1/moment.js) that highlights how it works:
+This folder structure makes a lot of sense during development, but what what it ends up exposing after it is processed for production is a variation of the module pattern we've looked at before. Here is a condensed version of it that highlights the pattern:
 
 ```javascript
 (function (global, factory) {
@@ -863,7 +873,9 @@ This folder structure makes a lot of sense during development, but what what it 
 })));
 ```
 
-Let's take a moment to digest this code. The outer-most function is another immediately-invoked function expression **(IIFE)**. It is immediately called with a passed-in factory function that holds all a closure over all of the variables and functions that the library uses.
+You can check out the full source [here](https://github.com/moment/moment/blob/96d0d6791ab495859d09a868803d31a55c917de1/moment.js).
+
+Let's take a moment to digest this code. The outer-most function is another immediately-invoked function expression **(IIFE)**. It is immediately called with a passed-in factory function that holds a closure over all of the variables and functions that the library uses.
 
 For an ES6 import statement like `import moment from 'moment'`, what is exposed is the return value of the factory as an export: `module.exports = factory()`.
 
@@ -922,9 +934,9 @@ Putting it all together, Moment's API summary looks like this:
 It is a clear example of a library that uses the module pattern to limit its API and chooses to rely on underscored properties to differentiate its underlying implementation.
 
 
-## Building Your Own
+## Find What Works for You
 
-JavaScript and its ecosystem doesn't have just one right way to do something. The goal of this walk-through is to highlight some of the tools and patterns JavaScript developers have available to them for managing the way they can build their libaries.
+JavaScript and its ecosystem doesn't have just one right way to do something. The goal of this walk-through is to highlight some of the tools and patterns JavaScript developers have available to them for managing the way they build their libraries.
 
 The decisions a library owner makes in exposing their API and controlling access and mutation of its data can have profound impact on the usability, maintainability and ultimately the success of the library within teams, organizations and the larger community.
 
