@@ -52,8 +52,7 @@ You: 4?
 <br>
 Me: Right again!
 
-But how many of those states are we explicitly handling? Only 2. What happens in those other 2 cases? Usually nothing, but potentially errors that we haven't accounted for, or that we'll
-uncover when we add new functionality.
+But how many of those states are we explicitly handling? Only 2. What happens in those other 2 cases? Usually nothing, but potentially errors that we haven't accounted for, or that we'll uncover when we add new functionality.
 
 This is an example of how from the basic conditionals we first learn to the complex systems we spend hours reviewing and testing, we are programmed to program for happy paths.
 
