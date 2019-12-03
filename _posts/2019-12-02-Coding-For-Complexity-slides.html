@@ -53,6 +53,9 @@ if (enabled && !eligible) {
 
 ## Transitioning to state machines
 
+Without a structured approach to iterating the states our code can be in it can be very difficult to make sure that you
+have all of your bases covered.
+
 ![state-machine](/images/tech/state-machine.png)
 
 While combinations of conditionals create inexhaustive, implicit applications states, state machines require explicit and comprehensive
@@ -140,7 +143,10 @@ states with additional features and patterns for managing complexity.
 > When NASA used the Statechart Autocoder to build the software for the Mars Science Laboratory (the Curiosity Rover),
 one of the reported benefits of using Statecharts was that “it forced developers to consider off nominal scenarios”.
 
-Read about them here: [public
+Whether you call them bugs, features, or off nominal scenarios, statecharts can help developers identify edge cases and
+write clearer state machine implementations.
+
+Read about the original formalization here: [public
 paper](http://www.inf.ed.ac.uk/teaching/courses/seoc/2005_2006/resources/statecharts.pdf)
 
 ---
