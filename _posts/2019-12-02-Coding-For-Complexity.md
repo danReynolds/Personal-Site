@@ -442,7 +442,7 @@ What if we wanted to allow a user to stop and resume applications for multiple f
 As actors, each statechart service can spawn and manage its own child services. We can create a `BankApplicationManagerMachine` to handle multiple applications:
 
 ```javascript
-import { Machine, spawn } from 'xstate';
+import { Machine, spawn, assign } from 'xstate';
 
 const BankApplicationManagerMachine = Machine({
   context: {
