@@ -171,12 +171,7 @@ pre {
   word-wrap: break-word;
   background-color: #09061b;
   width: max-content;
-
-}
-@media (min-width: 30em) {
-  pre {
-    width: 100%;
-  }
+  min-width: 100%;
 }
 pre code {
   padding: 0;
