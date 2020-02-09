@@ -170,7 +170,14 @@ pre {
   white-space: pre-wrap;
   word-break: break-all;
   word-wrap: break-word;
-  background-color: #f9f9f9;
+  background-color: #09061b;
+  width: max-content;
+
+}
+@media (min-width: 30em) {
+  pre {
+    width: 100%;
+  }
 }
 pre code {
   padding: 0;
@@ -180,9 +187,12 @@ pre code {
 }
 
 /* Pygments via Jekyll */
-.highlight {
+div.highlight {
   margin-bottom: 1rem;
   border-radius: 4px;
+  margin-left: -1rem;
+  margin-right: -1rem;
+  overflow: auto;
 }
 .highlight pre {
   margin-bottom: 0;
