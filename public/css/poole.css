@@ -156,7 +156,6 @@ code {
   padding: .25em .5em;
   font-size: 85%;
   color: #bf616a;
-  background-color: #f9f9f9;
   border-radius: 3px;
 }
 pre {
@@ -182,7 +181,7 @@ pre {
 pre code {
   padding: 0;
   font-size: 100%;
-  color: inherit;
+  color: #cccccc;
   background-color: transparent;
 }
 
@@ -246,10 +245,17 @@ img {
 
 /* Tables */
 table {
-  margin-bottom: 1rem;
+  margin: 1rem auto;
   width: 100%;
   border: 1px solid #e5e5e5;
   border-collapse: collapse;
+  overflow-x: auto;
+  display: block;
+}
+@media (min-width: 38em) {
+  table {
+    display: table;
+  }
 }
 td,
 th {

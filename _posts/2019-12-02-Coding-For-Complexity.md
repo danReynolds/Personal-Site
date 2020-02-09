@@ -184,7 +184,7 @@ Each actor encapsulates its own logic and exchanges information with other state
 
 Let's see how xstate can be used to model one of our actual button components. Our example code will be using React, but because its implementation is self-contained, it can be reused in your frontend framework of choice.
 
-```javascript
+```jsx
 const Button = ({
   onPress,
   enabled,
@@ -220,7 +220,7 @@ We write conditional logic like this all the time to model implicit state machin
 
 Now let's compare this to an explicit state machine model using xstate. We'll start with the state machine definition:
 
-```javascript
+```jsx
 const transitions = [
   { target: "#button.enabled", cond: (context, event) => !event.isLoading && event.onPress && event.enabled },
   { target: "#button.disabled.loading", cond: (context, event) => event.isLoading },
@@ -276,7 +276,7 @@ An **interpreter** is responsible for interpreting the state machine/statechart 
 
 Now that our conditional logic has been abstracted, we can focus on writing the plain presentational layer:
 
-```javascript
+```jsx
 const Button = ({
   onPress,
   enabled,
@@ -304,7 +304,7 @@ const Button = ({
 
 The `useMachine` API from `@xstate/react` interprets the given state machine and starts it as a service:
 
-```javascript
+```jsx
 import { interpret } from 'xstate'
 import { useRef, useState } from 'react';
 
@@ -362,7 +362,7 @@ This financial product will consist of a number of screens the user goes through
 * SSN
 * address
 
-```javascript
+```jsx
 import { Machine, assign } from 'xstate';
 
 const BankApplicationMachine = Machine(
@@ -441,7 +441,7 @@ What if we wanted to allow a user to stop and resume applications for multiple f
 
 As actors, each statechart service can spawn and manage its own child services. We can create a `BankApplicationManagerMachine` to handle multiple applications:
 
-```javascript
+```jsx
 import { Machine, spawn, assign } from 'xstate';
 
 const BankApplicationManagerMachine = Machine({
@@ -483,7 +483,7 @@ const BankApplicationManagerMachine = Machine({
 
 Our UI can then start the manager service and let the user switch between applications:
 
-```javascript
+```jsx
 import { useMachine, useService } from '@xstate/react'
 import { useMemo, useCallback } from 'react';
 
