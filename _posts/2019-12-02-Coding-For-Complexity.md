@@ -171,7 +171,7 @@ xstate implements the statechart model with all of its core feature specificatio
 * Hierarchical (nested) states
 * State history
 
-It additionally models each of its state machine objects as actors. The actor model is a model of concurrent computation that treats "actors" as the universal primitives of a system, with each actor to perform three core functions:
+It additionally models each of its state machine objects as actors. The actor model is a model of concurrent computation that treats "actors" as the universal primitives of a system, with each actor able to perform three core functions:
 
 * Receive messages from other actors
 * Send messages to other actors
