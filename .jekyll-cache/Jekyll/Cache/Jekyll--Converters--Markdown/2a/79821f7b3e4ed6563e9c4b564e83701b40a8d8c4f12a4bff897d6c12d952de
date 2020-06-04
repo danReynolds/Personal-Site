@@ -1,0 +1,268 @@
+I")w<p>RxJS is well suited for handling retrying of requests and the Redux Observable middleware
+allows us to integrate it into our React-Redux application.</p>
+
+<!--halt-->
+
+<h1 id="what-is-it">What is it?</h1>
+
+<p>Redux Observable is a library built around RxJS, a reactive programming library that allows you to
+effectively manage sequences of asynchronous events using observables.</p>
+
+<p>You can think of RxJS as Lodash for promises and Redux-Observable as Lodash for asynchronous redux actions.</p>
+
+<h1 id="rxjs">RxJS</h1>
+
+<p>To understand Redux-Observable, first you need to know RxJS.</p>
+
+<p>RxJS uses Observables, Observers and Subscriptions to handle processing of events.</p>
+
+<p>If you want to learn more about RxJS after this really brief summary, checkout their <a href="http://reactivex.io/rxjs/manual/overview.html#introduction">official docs</a>,
+they’re really good and most of the good content here is coming from them.</p>
+
+<h1 id="observables">Observables</h1>
+
+<p>I found these charts from RxJS really helpful in understand Observables and their place
+among other producers/consumers:</p>
+
+<p><img src="/images/tech/push-pull.png" alt="pushPull" />
+<img src="/images/tech/push-pull-definitions.png" alt="pushPull" /></p>
+
+<p>We are generally more familiar with pulling values synchronously with functions and iterators.</p>
+
+<p>When we want to have a single value pushed to us, we use promises. Observables sort of look like promises for multiple values,
+but the way that RxJS recommends you think about them is as functions that can be either synchronous or asynchronous and return 0 to many values.</p>
+
+<h1 id="synchronous-and-single-value">Synchronous and Single Value</h1>
+
+<p>To use an observable you need to subscribe to it, which is analogous to calling a function:</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">foo</span> <span class="o">=</span> <span class="nx">Rx</span><span class="p">.</span><span class="nx">Observable</span><span class="p">.</span><span class="nx">create</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">observer</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">'</span><span class="s1">Hello</span><span class="dl">'</span><span class="p">);</span>
+  <span class="nx">observer</span><span class="p">.</span><span class="nx">next</span><span class="p">(</span><span class="mi">42</span><span class="p">);</span>
+<span class="p">});</span>
+
+<span class="nx">foo</span><span class="p">.</span><span class="nx">subscribe</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">x</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">x</span><span class="p">);</span>
+<span class="p">});</span>
+<span class="nx">foo</span><span class="p">.</span><span class="nx">subscribe</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">y</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">y</span><span class="p">);</span>
+<span class="p">});</span>
+<span class="c1">// Output:</span>
+<span class="c1">// "Hello"</span>
+<span class="c1">// 42</span>
+<span class="c1">// "Hello"</span>
+<span class="c1">// 42</span>
+</code></pre></div></div>
+
+<p>We create an <strong>observable</strong> which emits a value of 42 to its <strong>observer</strong>, similarly to a generator. We <strong>subscribe</strong> to the <strong>observable</strong>
+in order to start its <strong>observable execution</strong> and it <strong>synchronously</strong> emits a value of 42.</p>
+
+<h1 id="asynchronous-and-multiple-values">Asynchronous and Multiple Values</h1>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">observable</span> <span class="o">=</span> <span class="nx">Rx</span><span class="p">.</span><span class="nx">Observable</span><span class="p">.</span><span class="nx">create</span><span class="p">(</span><span class="kd">function</span> <span class="nx">subscribe</span><span class="p">(</span><span class="nx">observer</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">setInterval</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="nx">observer</span><span class="p">.</span><span class="nx">next</span><span class="p">(</span><span class="dl">'</span><span class="s1">Hello</span><span class="dl">'</span><span class="p">);</span>
+  <span class="p">},</span> <span class="mi">1000</span><span class="p">);</span>
+<span class="p">});</span>
+<span class="kd">const</span> <span class="nx">subscription</span> <span class="o">=</span> <span class="nx">observable</span><span class="p">.</span><span class="nx">subscribe</span><span class="p">((</span><span class="nx">x</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">x</span><span class="p">));</span>
+<span class="nx">setTimeout</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="nx">subscription</span><span class="p">.</span><span class="nx">unsubscribe</span><span class="p">(),</span> <span class="mi">2000</span><span class="p">);</span>
+<span class="p">);</span>
+</code></pre></div></div>
+
+<p>Now if we subscribe to the <strong>observer</strong>, it will emit a value of <code class="language-plaintext highlighter-rouge">Hello</code> <strong>asynchronously</strong> every second. This <strong>observable execution</strong> could run forever,
+so to stop it, each call to subscribe returns a <strong>subscription</strong> object that we can then <strong>unsubscribe</strong> to, releasing the resources of the execution.</p>
+
+<h1 id="unicast-observables">Unicast Observables</h1>
+
+<p>A normal Observable is unicast. Unlike an event emitter, each subscription has its own observable execution.</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">observable</span> <span class="o">=</span> <span class="nx">Rx</span><span class="p">.</span><span class="nx">Observable</span><span class="p">.</span><span class="nx">create</span><span class="p">(</span><span class="kd">function</span> <span class="nx">subscribe</span><span class="p">(</span><span class="nx">observer</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="nx">interval</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">random</span><span class="p">()</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">;</span>
+  <span class="nx">setInterval</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="nx">observer</span><span class="p">.</span><span class="nx">next</span><span class="p">(</span><span class="nx">interval</span><span class="p">);</span>
+  <span class="p">},</span> <span class="nx">interval</span><span class="p">);</span>
+<span class="p">});</span>
+<span class="kd">var</span> <span class="nx">subject</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Rx</span><span class="p">.</span><span class="nx">Subject</span><span class="p">();</span>
+<span class="kd">const</span> <span class="nx">subscription</span> <span class="o">=</span> <span class="nx">observable</span><span class="p">.</span><span class="nx">subscribe</span><span class="p">((</span><span class="nx">x</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">x</span><span class="p">));</span>
+<span class="kd">const</span> <span class="nx">subscription2</span> <span class="o">=</span> <span class="nx">observable</span><span class="p">.</span><span class="nx">subscribe</span><span class="p">((</span><span class="nx">x</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">x</span><span class="p">));</span>
+<span class="nx">setTimeout</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="p">{</span> <span class="nx">subscription</span><span class="p">.</span><span class="nx">unsubscribe</span><span class="p">();</span> <span class="nx">subscription2</span><span class="p">.</span><span class="nx">unsubscribe</span><span class="p">()</span> <span class="p">},</span> <span class="mi">2000</span><span class="p">);</span>
+<span class="c1">// Output:</span>
+<span class="c1">// "726.3712515255427"</span>
+<span class="c1">// "834.8198863348033"</span>
+<span class="c1">// "726.3712515255427"</span>
+<span class="c1">// "834.8198863348033"</span>
+</code></pre></div></div>
+
+<p>Each subscription had its own observable execution, generating different random intervals.</p>
+
+<h1 id="multicast-observables">Multicast Observables</h1>
+
+<p>A Subject is a both an observable and an observer. It is multicast, sharing one observable execution and behaves like an event emitter.</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">observable</span> <span class="o">=</span> <span class="nx">Rx</span><span class="p">.</span><span class="nx">Observable</span><span class="p">.</span><span class="nx">create</span><span class="p">(</span><span class="kd">function</span> <span class="nx">subscribe</span><span class="p">(</span><span class="nx">observer</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="nx">interval</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">random</span><span class="p">()</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">;</span>
+  <span class="nx">setInterval</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="nx">observer</span><span class="p">.</span><span class="nx">next</span><span class="p">(</span><span class="nx">interval</span><span class="p">);</span>
+  <span class="p">},</span> <span class="nx">interval</span><span class="p">);</span>
+<span class="p">});</span>
+<span class="kd">var</span> <span class="nx">subject</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Rx</span><span class="p">.</span><span class="nx">Subject</span><span class="p">();</span>
+<span class="kd">const</span> <span class="nx">subscription</span> <span class="o">=</span> <span class="nx">subject</span><span class="p">.</span><span class="nx">subscribe</span><span class="p">((</span><span class="nx">x</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">x</span><span class="p">));</span>
+<span class="kd">const</span> <span class="nx">subscription2</span> <span class="o">=</span> <span class="nx">subject</span><span class="p">.</span><span class="nx">subscribe</span><span class="p">((</span><span class="nx">x</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">x</span><span class="p">));</span>
+<span class="nx">observable</span><span class="p">.</span><span class="nx">subscribe</span><span class="p">(</span><span class="nx">subject</span><span class="p">);</span>
+<span class="nx">setTimeout</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="nx">subject</span><span class="p">.</span><span class="nx">unsubscribe</span><span class="p">(),</span> <span class="mi">2000</span><span class="p">);</span>
+<span class="c1">// Output:</span>
+<span class="c1">// "976.9587382573253"</span>
+<span class="c1">// "976.9587382573253"</span>
+<span class="c1">// "976.9587382573253"</span>
+<span class="c1">// "976.9587382573253"</span>
+</code></pre></div></div>
+
+<p>Here we have 2 subscriptions subscribe to the subject like any other observable. We then pass the subject in to
+an observable as an observer. Both subscriptions share the same observable execution and the observer multicasts events to both.</p>
+
+<h1 id="using-rxjs-with-redux-actions">Using RxJS with Redux Actions</h1>
+
+<p>Now that we are RxJS masters, let’s add it to our Redux app!</p>
+
+<p>Redux-Observable allows us to operate on streams of actions, similarly to how RxJS operates on streams of events.</p>
+
+<p>You create epics, functions which take a stream of actions and returns an optionally transformed stream of actions.</p>
+
+<p>You configure it by hooking up its <code class="language-plaintext highlighter-rouge">epicMiddleware</code> like any other middleware:</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">createEpicMiddleware</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">redux-observable</span><span class="dl">'</span><span class="p">;</span>
+<span class="k">import</span> <span class="nx">rootEpic</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">./epics</span><span class="dl">'</span><span class="p">;</span>
+
+<span class="kd">const</span> <span class="nx">epicMiddleware</span> <span class="o">=</span> <span class="nx">createEpicMiddleware</span><span class="p">(</span><span class="nx">rootEpic</span><span class="p">);</span>
+<span class="kd">const</span> <span class="nx">middlewares</span> <span class="o">=</span> <span class="p">[</span>
+  <span class="nx">epicMiddleware</span><span class="p">,</span>
+  <span class="p">...</span>
+<span class="p">];</span>
+</code></pre></div></div>
+
+<h1 id="epics">Epics</h1>
+
+<p>Here is a simple epic example straight from their docs:</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">pingEpic</span> <span class="o">=</span> <span class="nx">action$</span> <span class="o">=&gt;</span>
+  <span class="nx">action$</span><span class="p">.</span><span class="nx">filter</span><span class="p">(</span><span class="nx">action</span> <span class="o">=&gt;</span> <span class="nx">action</span><span class="p">.</span><span class="nx">type</span> <span class="o">===</span> <span class="dl">'</span><span class="s1">PING</span><span class="dl">'</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">mapTo</span><span class="p">({</span> <span class="na">type</span><span class="p">:</span> <span class="dl">'</span><span class="s1">PONG</span><span class="dl">'</span> <span class="p">});</span>
+
+<span class="c1">// later...</span>
+<span class="nx">dispatch</span><span class="p">({</span> <span class="na">type</span><span class="p">:</span> <span class="dl">'</span><span class="s1">PING</span><span class="dl">'</span> <span class="p">});</span>
+</code></pre></div></div>
+
+<p>Our epic takes in a stream of actions and filters them to a certain type. It then maps it to an action of type <code class="language-plaintext highlighter-rouge">PONG</code> and fires that action, essentially equivalent to:</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">dispatch</span><span class="p">({</span> <span class="na">type</span><span class="p">:</span> <span class="dl">'</span><span class="s1">PING</span><span class="dl">'</span> <span class="p">});</span>
+<span class="nx">dispatch</span><span class="p">({</span> <span class="na">type</span><span class="p">:</span> <span class="dl">'</span><span class="s1">PONG</span><span class="dl">'</span> <span class="p">});</span>
+</code></pre></div></div>
+
+<h1 id="retrying-requests">Retrying Requests</h1>
+
+<p>In our React-Native Redux app, a spotty connection could result in some of our requests failing and we wanted to make these requests retriable.</p>
+
+<p>We are using this amazing open source async actions library called <a href="https://github.com/evanhobbs/redux-easy-async">Redux Easy Async</a> that generates
+start, success and fail actions for async requests.</p>
+
+<p>using redux-easy-async and redux-observable we built a retry epic.</p>
+
+<h1 id="retry-epic">Retry Epic</h1>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">retryEpic</span> <span class="o">=</span> <span class="nx">action$</span> <span class="o">=&gt;</span>
+  <span class="nx">action$</span><span class="p">.</span><span class="k">do</span><span class="p">(</span><span class="nx">action</span> <span class="o">=&gt;</span> <span class="nx">retrySubject</span><span class="p">.</span><span class="nx">next</span><span class="p">(</span><span class="nx">action</span><span class="p">))</span>
+  <span class="p">.</span><span class="nx">filter</span><span class="p">(</span><span class="nx">isRetriable</span><span class="p">).</span><span class="nx">mergeMap</span><span class="p">((</span><span class="nx">action</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="nx">failures</span> <span class="o">=</span> <span class="nx">action</span><span class="p">.</span><span class="nx">meta</span><span class="p">.</span><span class="nx">failures</span> <span class="o">||</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="kd">const</span> <span class="nx">retryAction</span> <span class="o">=</span> <span class="nx">retriableAction</span><span class="p">(</span><span class="nx">action</span><span class="p">,</span> <span class="p">{</span> <span class="na">failures</span><span class="p">:</span> <span class="nx">failures</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">});</span>
+    <span class="kd">const</span> <span class="nx">retryActionObservable</span> <span class="o">=</span> <span class="nx">Observable</span><span class="p">.</span><span class="k">of</span><span class="p">(</span><span class="nx">retryAction</span><span class="p">);</span>
+
+    <span class="c1">// If online, schedule the action for re-trying after waiting an exponential delay.</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nb">global</span><span class="p">.</span><span class="nb">navigator</span><span class="p">.</span><span class="nx">onLine</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="nx">retryActionObservable</span><span class="p">.</span><span class="nx">delay</span><span class="p">(</span><span class="nx">calculateExponentialBackoff</span><span class="p">(</span><span class="nx">failures</span><span class="p">));</span>
+    <span class="p">}</span>
+
+    <span class="c1">// If not online, schedule the action for re-trying when network connectivity changes.</span>
+    <span class="k">return</span> <span class="nx">Observable</span><span class="p">.</span><span class="nx">fromEvent</span><span class="p">(</span><span class="nx">NetInfo</span><span class="p">,</span> <span class="dl">'</span><span class="s1">connectionChange</span><span class="dl">'</span><span class="p">)</span>
+      <span class="p">.</span><span class="nx">first</span><span class="p">().</span><span class="nx">mergeMap</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="nx">retryActionObservable</span><span class="p">);</span>
+  <span class="p">});</span>
+</code></pre></div></div>
+
+<p>Here we take advantage of a number of RxJS utility methods. This is where it starts looking like Lodash. RxJS has great docs
+for all of the supported utility methods. Check them out <a href="http://reactivex.io/rxjs/class/es6/Observable.js~Observable.html">here</a>.</p>
+
+<h1 id="retriabledispatch">retriableDispatch</h1>
+
+<p>Anywhere we want to dispatch a retriable action, call <code class="language-plaintext highlighter-rouge">retriableDispatch(dispatch, action()</code> instead. For example, we do
+<code class="language-plaintext highlighter-rouge">retriableDispatch(dispatch, requestFeatureFlags(true)</code> when the app starts up to retry important calls like to get feature flags.</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">export</span> <span class="kd">const</span> <span class="nx">retriableDispatch</span> <span class="o">=</span> <span class="p">(</span><span class="nx">dispatch</span><span class="p">,</span> <span class="nx">action</span><span class="p">,</span> <span class="nx">args</span> <span class="o">=</span> <span class="p">{})</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="nx">retryAction</span> <span class="o">=</span> <span class="nx">retriableAction</span><span class="p">(</span><span class="nx">action</span><span class="p">,</span> <span class="nx">args</span><span class="p">);</span>
+  <span class="kd">const</span> <span class="nx">failType</span> <span class="o">=</span> <span class="nx">retryAction</span><span class="p">.</span><span class="nx">failActionCreator</span><span class="p">().</span><span class="nx">type</span><span class="p">;</span>
+  <span class="kd">const</span> <span class="nx">successType</span> <span class="o">=</span> <span class="nx">retryAction</span><span class="p">.</span><span class="nx">successActionCreator</span><span class="p">().</span><span class="nx">type</span><span class="p">;</span>
+  <span class="kd">const</span> <span class="p">{</span> <span class="na">meta</span><span class="p">:</span> <span class="p">{</span> <span class="nx">retries</span><span class="p">,</span> <span class="nx">retryId</span> <span class="p">}</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">retryAction</span><span class="p">;</span>
+
+  <span class="k">return</span> <span class="k">new</span> <span class="nb">Promise</span><span class="p">((</span><span class="nx">resolve</span><span class="p">,</span> <span class="nx">reject</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="nx">cancelObservable</span> <span class="o">=</span> <span class="nx">retrySubject</span><span class="p">.</span><span class="nx">first</span><span class="p">(</span>
+      <span class="nx">act</span> <span class="o">=&gt;</span> <span class="nx">act</span><span class="p">.</span><span class="nx">type</span> <span class="o">===</span> <span class="nx">failType</span> <span class="o">&amp;&amp;</span> <span class="nx">act</span><span class="p">.</span><span class="nx">meta</span><span class="p">.</span><span class="nx">retryId</span> <span class="o">===</span> <span class="nx">retryId</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="nx">act</span><span class="p">.</span><span class="nx">meta</span><span class="p">.</span><span class="nx">shouldRetry</span><span class="p">(</span><span class="nx">act</span><span class="p">)</span>
+    <span class="p">);</span>
+    <span class="kd">const</span> <span class="nx">failureObservable</span> <span class="o">=</span> <span class="nx">retrySubject</span>
+      <span class="p">.</span><span class="nx">filter</span><span class="p">(({</span> <span class="nx">type</span><span class="p">,</span> <span class="nx">meta</span> <span class="p">})</span> <span class="o">=&gt;</span> <span class="nx">type</span> <span class="o">===</span> <span class="nx">failType</span> <span class="o">&amp;&amp;</span> <span class="nx">meta</span><span class="p">.</span><span class="nx">retryId</span> <span class="o">===</span> <span class="nx">retryId</span><span class="p">).</span><span class="nx">take</span><span class="p">(</span><span class="nx">retries</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+      <span class="p">.</span><span class="nx">last</span><span class="p">();</span>
+    <span class="kd">const</span> <span class="nx">successObservable</span> <span class="o">=</span> <span class="nx">retrySubject</span>
+      <span class="p">.</span><span class="nx">first</span><span class="p">(({</span> <span class="nx">type</span><span class="p">,</span> <span class="nx">meta</span> <span class="p">})</span> <span class="o">=&gt;</span> <span class="nx">type</span> <span class="o">===</span> <span class="nx">successType</span> <span class="o">&amp;&amp;</span> <span class="nx">meta</span><span class="p">.</span><span class="nx">retryId</span> <span class="o">===</span> <span class="nx">retryId</span><span class="p">);</span>
+
+    <span class="nx">Observable</span><span class="p">.</span><span class="nx">race</span><span class="p">(</span>
+      <span class="nx">cancelObservable</span><span class="p">,</span>
+      <span class="nx">failureObservable</span><span class="p">,</span>
+      <span class="nx">successObservable</span>
+    <span class="p">).</span><span class="nx">subscribe</span><span class="p">(({</span> <span class="nx">type</span><span class="p">,</span> <span class="nx">payload</span> <span class="p">})</span> <span class="o">=&gt;</span> <span class="p">(</span><span class="nx">type</span> <span class="o">===</span> <span class="nx">successType</span> <span class="p">?</span> <span class="nx">resolve</span><span class="p">(</span><span class="nx">payload</span><span class="p">)</span> <span class="p">:</span> <span class="nx">reject</span><span class="p">(</span><span class="nx">payload</span><span class="p">)));</span>
+
+    <span class="nx">dispatch</span><span class="p">(</span><span class="nx">retryAction</span><span class="p">);</span>
+  <span class="p">});</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<h1 id="how-it-works">How it works</h1>
+
+<p>We first convert the action to a retriable action, which just adds meta data to the action like how many times it has failed, and an unique identifier.</p>
+
+<p>We then return a promise, so that callers can chain the async dispatch:</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">retriableDispatch</span><span class="p">(</span><span class="nx">dispatch</span><span class="p">,</span> <span class="nx">requestFeatureFlags</span><span class="p">()).</span><span class="nx">then</span><span class="p">(</span><span class="nx">dispatch</span><span class="p">(</span><span class="nx">otherAction</span><span class="p">()));</span>
+</code></pre></div></div>
+
+<p>The promise resolves or rejects based on the actions sent to the retrySubject. We subscribe to <code class="language-plaintext highlighter-rouge">Observable.race</code>, an observable that mirrors the first observable to emit.</p>
+
+<p>The race is between a success action, a certain number of failures, or a cancel, which can happen if a retriable action’s <code class="language-plaintext highlighter-rouge">shouldRetry</code> boolean function returns false based on changes in
+the application’s state.</p>
+
+<h1 id="where-else-can-we-use-it">Where Else can we Use It?</h1>
+
+<p>I think redux-observable and RxJS in general is great for situations like retrying where you want to observe and act on streams of actions. Think about filtering and doing things in response to certain actions, or combinations of actions.</p>
+
+<p>If you take a look at this post on <a href="https://netbasal.com/rxjs-six-operators-that-you-must-know-5ed3b6e238a0">6 RxJS operators to know</a> you can see possible applications like waiting for a certain sequence of actions before doing something.</p>
+
+<h1 id="you-are-already-using-it">You are already using it!</h1>
+
+<p>Redux uses reducers that react to actions, take in state, produce new state and pass it down to components. This can be accomplished with a single line of RxJS:</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">action$</span><span class="p">.</span><span class="nx">scan</span><span class="p">(</span><span class="nx">reducer</span><span class="p">).</span><span class="nx">subscribe</span><span class="p">(</span><span class="nx">renderer</span><span class="p">)</span>  
+</code></pre></div></div>
+
+<p>Here, a scan is performed on a stream of actions, which is like the javascript reduce method, except that it emits the current accumulated value with each iteration.</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">].</span><span class="nx">scan</span><span class="p">((</span><span class="nx">acc</span><span class="p">,</span> <span class="nx">i</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="nx">acc</span> <span class="o">+</span> <span class="nx">i</span><span class="p">;</span>
+<span class="p">},</span> <span class="mi">0</span><span class="p">);</span>
+<span class="c1">// Output:</span>
+<span class="c1">// 1</span>
+<span class="c1">// 3</span>
+<span class="c1">// 6</span>
+</code></pre></div></div>
+
+<p>Each time it emits, the react component receives the new state and can re-render.</p>
+
+<h1 id="try-it-out">Try it out!</h1>
+
+<p>RxJS can be used in combination with Redux-Observable or without, give it a try!</p>
+:ET

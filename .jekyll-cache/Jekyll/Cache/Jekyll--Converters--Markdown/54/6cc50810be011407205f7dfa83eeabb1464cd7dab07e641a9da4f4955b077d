@@ -1,0 +1,87 @@
+I"�<p>When I re-did my website, I decided to make some sort of blog to go with it. After some quick searching on the different ways to set one up, I decided to go with <a href="http://jekyllrb.com/">Jekyll</a>, a static site generator written in Ruby and that can be installed as a RubyGem.</p>
+
+<!--halt-->
+
+<h1 id="choosing-a-host">Choosing a Host</h1>
+
+<p>One of the first things I did before starting my blog was finding a place to host it. I first considered getting a
+box from DigitalOcean like I have with a couple of my past projects, but I instead went with <a href="https://pages.github.com">GitHub Pages</a>.</p>
+
+<p>Each person with a GitHub account gets a free subdomain for each of their projects at <code class="language-plaintext highlighter-rouge">project.github.io</code>, as well
+as one <em>account</em> subdomain at account.github.io. This account subdomain makes for a perfect place to host a jekyll blog. Since
+GitHub Pages support Jekyll already and setting up a blog is as simple as creating a repository on GitHub and then pushing
+to your Jekyll blog repo whenever you want to redeploy.</p>
+
+<h1 id="finding-a-template">Finding a template</h1>
+
+<p>To setup a Jekyll Blog on GitHub pages, install the <code class="language-plaintext highlighter-rouge">github-pages</code> gem in the folder of the blog repository. To get myself off the ground,
+I used <a href="http://www.smashingmagazine.com/2014/08/build-blog-jekyll-github-pages">this guide</a> as a starting point, since they offered a pretty vanilla
+Jekyll setup that I could configure however I wanted.</p>
+
+<p>There are a bunch of Jekyll blog themes out there, although some are incompatible with GitHub Pages, as Pages only
+supports a subset of all the Jekyll plugins.</p>
+
+<h1 id="building-a-layout">Building a layout</h1>
+
+<p>As Jekyll describes itself, the engine takes text written in any markup language and sends it through a series of layout files. My vanilla
+install already had some layout files defined, but I modified them to be a little simpler and to match the look I was going for.</p>
+
+<p>I currently am using three layout files:</p>
+
+<ol>
+  <li><strong>default.html</strong>: A default layout that wraps a page or post in a predefined HTML structure.</li>
+  <li><strong>page.html</strong>: A template that describes the structure of any page that I create, such as an about page.</li>
+  <li><strong>post.html</strong>: A template that describes the structure of any post that I create, like this one.</li>
+</ol>
+
+<p>In this post, for example, my default layout centers content within a container and adds my header to the page. It then uses the <a href="https://github.com/Shopify/liquid/wiki">Liquid</a> templating language to inject the content. My body for the default layout looks like this:</p>
+
+<figure class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">'container'</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;header&gt;</span>
+    <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">'site-info'</span><span class="nt">&gt;</span>
+      <span class="nt">&lt;h1&gt;&lt;a</span> <span class="na">href=</span><span class="s">''</span><span class="nt">&gt;&lt;/a&gt;&lt;/h1&gt;</span>
+      <span class="nt">&lt;p&gt;</span>Software is hard<span class="nt">&lt;/p&gt;</span>
+    <span class="nt">&lt;/div&gt;</span>
+  <span class="nt">&lt;/header&gt;</span>
+  <span class="nt">&lt;section</span> <span class="na">class=</span><span class="s">'content'</span><span class="nt">&gt;</span>
+    // Inject content with Liquid here
+  <span class="nt">&lt;/section&gt;</span>
+<span class="nt">&lt;/div&gt;</span></code></pre></figure>
+
+<p>The <code class="language-plaintext highlighter-rouge">post.html</code> file is then rendered in the content section. My <code class="language-plaintext highlighter-rouge">post.html</code> layout is very simple:</p>
+
+<figure class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;article</span> <span class="na">class=</span><span class="s">"post"</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;h1</span> <span class="na">class=</span><span class="s">'post-title'</span><span class="nt">&gt;</span>Setting Up a Blog<span class="nt">&lt;/h1&gt;</span>
+  <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"date"</span><span class="nt">&gt;</span>
+    Written on September 10, 2015
+  <span class="nt">&lt;/div&gt;</span>
+  <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"entry"</span><span class="nt">&gt;</span>
+    // Inject content with Liquid here
+  <span class="nt">&lt;/div&gt;</span>
+<span class="nt">&lt;/article&gt;</span></code></pre></figure>
+
+<p>First there is a title and a date for the post, and then the content of the post itself is injected within the entry.</p>
+
+<p>Blog entries can be written in a variety of markup languages, for mine I like to use markdown.</p>
+
+<h1 id="styling-content">Styling content</h1>
+
+<p>I used SASS to style my layouts and posts. I included the <a href="http://bourbon.io">Bourbon</a> gem, which provides a collection of mixins that I find
+useful when styling applications, especially to help with vendor-prefixed styles in a similar way to Compass.</p>
+
+<p>Bourbon breaks its library into general mixins, grid mixins, and scaffolding, each with its respective gem. I used all of them here, since I needed some of the general mixins, as well as a grid and wanted some default styles.</p>
+
+<p>I like Bourbon because it isn’t a front-end framework like Bootstrap or Foundation, which seems like overkill for my small blog, but instead just gives me the few mixins I need to make styling easier.</p>
+
+<p>I did include some scaffolding with the Bourbon Bitters gem, which like the other framework alters the appearance of several components, but it is in comparison very light-weight. Bitters breaks all of its styles into logical files for different components, making it simple to keep and modify only the styles you need, such as my blog’s typography, grid settings, and lists.</p>
+
+<h1 id="hooking-up-the-blog">Hooking up the blog</h1>
+
+<p>Now that my Blog is deployed to GitHub Pages, I want to connect it to my website at <code class="language-plaintext highlighter-rouge">danreynolds.ca</code>. To do that, I setup a
+<code class="language-plaintext highlighter-rouge">CNAME</code> in my site’s DNS records, which forwards my subdomain <code class="language-plaintext highlighter-rouge">blog</code> to the Pages site.</p>
+
+<p>Finally, I had to add a <code class="language-plaintext highlighter-rouge">CNAME</code> file in the root of the blog repository containing <strong>only</strong> the name of the custom domain.
+My custom domain was <code class="language-plaintext highlighter-rouge">blog.danreynolds.ca</code>.</p>
+
+<p>With everything setup, I now have a perfect way to say random things that might sometimes be enjoyable or possibly even useful. Hurray for blogging!</p>
+:ET

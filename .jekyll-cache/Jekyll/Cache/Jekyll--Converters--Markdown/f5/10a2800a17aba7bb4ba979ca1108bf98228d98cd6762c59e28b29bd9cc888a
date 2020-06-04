@@ -1,0 +1,158 @@
+I"�H<p>A state subscriptions library for transforming a stream of Redux actions into a stream of path changes.</p>
+
+<!--halt-->
+
+<h1 id="what-is-a-state-subscription">What is a State Subscription?</h1>
+
+<p>The purpose of a state subscription is to detect when a change occurs to a path
+we care about in the Redux store and perform any necessary side effects.</p>
+
+<p>Redux already provides us with a tool for detecting basic changes to the Redux store using <a href="https://redux.js.org/advanced/middleware">middlewares</a>.</p>
+
+<p>Redux middlewares run in-between the dispatching of an action and the receiving of the actions by the reducers.</p>
+
+<p>A basic state subscription middleware could look something like this:</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">middleware</span> <span class="o">=</span> <span class="nx">store</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="p">{</span> <span class="nx">dispatch</span><span class="p">,</span> <span class="nx">getState</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">store</span><span class="p">;</span>
+
+    <span class="k">return</span> <span class="nx">next</span> <span class="o">=&gt;</span> <span class="nx">action</span> <span class="o">=&gt;</span> <span class="p">{</span>
+        <span class="kd">const</span> <span class="nx">prevState</span> <span class="o">=</span> <span class="nx">getState</span><span class="p">();</span>
+        <span class="kd">const</span> <span class="nx">result</span> <span class="o">=</span> <span class="nx">next</span><span class="p">(</span><span class="nx">action</span><span class="p">);</span>
+        <span class="kd">const</span> <span class="nx">nextState</span> <span class="o">=</span> <span class="nx">getState</span><span class="p">();</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="nx">nextState</span><span class="p">.</span><span class="nx">path</span> <span class="o">!==</span> <span class="nx">prevState</span><span class="p">.</span><span class="nx">path</span><span class="p">)</span> <span class="p">{</span>
+            <span class="c1">// Perform side effect</span>
+            <span class="nx">dispatch</span><span class="p">(</span><span class="nx">sideEffectAction</span><span class="p">());</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="nx">result</span><span class="p">;</span>
+    <span class="p">};</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Under the hood, middlewares are functions that get composed together in the order that they are applied when the store is created.</p>
+
+<p>Consider middleware functions applied in the order <code class="language-plaintext highlighter-rouge">a, b</code>. This middleware chain is composed as <code class="language-plaintext highlighter-rouge">a(b(store.dispatch)))</code> so that the <code class="language-plaintext highlighter-rouge">next</code> in each middleware references
+the next middleware function to hand the action off to, all the way until it reaches the redux <code class="language-plaintext highlighter-rouge">dispatch</code> method which runs it through the reducers.</p>
+
+<p>In the above example, we grab the current state, let the action run through the middleware chain and the reducers by handing off to <code class="language-plaintext highlighter-rouge">next</code> and then re-fetch the current state. By comparing the previous state
+to the next state we’re able to see if the paths we care about have been mutated in the Redux store and huzzah!</p>
+
+<p>We’ve made a basic state subscription.</p>
+
+<h1 id="making-subscriptions-generic">Making Subscriptions Generic</h1>
+
+<p>We have a number of use cases for monitoring changes to the Redux store in our applications and we want to apply our state subscription solution generically to all of them.</p>
+
+<p>One example is our React Native application’s persistent storage. We have a need to persist specific parts of our Redux store across user sessions in order to deliver a great user experience on returning to the app. We can achieve this by monitoring for changes to our Redux state and sending them down to the native layer where they can be stored securely across app launches.</p>
+
+<p>The core requirements for this functionality would be that it is:</p>
+
+<ol>
+  <li><strong>Asynchronous</strong> - Persisting changes to native storage takes time, Redux middlewares should not be blocked while performing the side effects of our state subscriptions</li>
+  <li><strong>Ordered</strong> - Changes to the state should be queued and persisted in the order that they were detected</li>
+  <li><strong>Performant</strong> - The Redux store changes frequently, since all we care about at time <code class="language-plaintext highlighter-rouge">x</code> is the current state of the Redux store, we can batch actions together</li>
+</ol>
+
+<p>Asynchronous side effects? Ordered buffers? This sounds like a perfect application of Redux-Observable!</p>
+
+<p>If you are unfamiliar with Redux-Observable, it is a reactive programming library that applies the observable pattern using RxJS to create observable streams of actions. To learn more about it and observables in general you can check out a <a href="/tech/2018/01/18/Using-RxJS/">previous post</a>.</p>
+
+<h1 id="epic-state-subscriptions">Epic State Subscriptions</h1>
+
+<p>The core primitive of Redux-Observable are epics, functions which receive a stream of actions and returns a stream of actions. <strong>Actions in</strong>. <strong>Actions out</strong>.</p>
+
+<p><img src="/images/tech/redux-observable-process-diagram.png" alt="Redux Observable Process Diagram" /></p>
+
+<p>All the state subscription needs to do is transform a stream of actions into a stream of path changes and then standard RxJS operators can do the rest. This functionality is available as its own RxJS operator supplied by our <a href="https://github.com/NerdWalletOSS/epic-state-subscriptions">Epic State Subscriptions</a> library.</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">ignoreElements</span><span class="p">,</span> <span class="nx">tap</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">rxjs/operators</span><span class="dl">'</span><span class="p">;</span>
+<span class="k">import</span> <span class="p">{</span> <span class="nx">createStateSubscription</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">epic-state-subscriptions</span><span class="dl">'</span><span class="p">;</span>
+<span class="k">import</span> <span class="p">{</span> <span class="nx">sideEffectAction</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">./Actions</span><span class="dl">'</span><span class="p">;</span>
+
+<span class="kd">const</span> <span class="nx">persistenceEpic</span> <span class="o">=</span> <span class="p">(</span><span class="nx">action$</span><span class="p">,</span> <span class="nx">state$</span><span class="p">)</span> <span class="o">=&gt;</span>
+  <span class="nx">action$</span><span class="p">.</span><span class="nx">pipe</span><span class="p">(</span>
+    <span class="nx">createStateSubscription</span><span class="p">(</span><span class="nx">state$</span><span class="p">,</span> <span class="p">{</span>
+      <span class="na">paths</span><span class="p">:</span> <span class="p">[</span><span class="dl">'</span><span class="s1">x.y.z</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">a.b.*</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">*.c.d</span><span class="dl">'</span><span class="p">],</span>
+    <span class="p">}),</span>
+    <span class="nx">tap</span><span class="p">(</span><span class="nx">paths</span> <span class="o">=&gt;</span> <span class="p">{</span>
+      <span class="nx">paths</span><span class="p">.</span><span class="nx">forEach</span><span class="p">({</span> <span class="nx">path</span><span class="p">,</span> <span class="nx">nextState</span> <span class="p">}</span> <span class="o">=&gt;</span> <span class="p">{</span>
+        <span class="nx">NativeLayer</span><span class="p">.</span><span class="nx">persist</span><span class="p">(</span><span class="nx">path</span><span class="p">,</span> <span class="nx">nextState</span><span class="p">);</span>
+      <span class="p">});</span>
+      <span class="k">return</span> <span class="nx">sideEffectAction</span><span class="p">();</span>
+    <span class="p">}),</span>
+  <span class="p">);</span>
+</code></pre></div></div>
+
+<p>The persistence epic receives the mapped actions as a stream of path changes that we can then persist to the native layer. Epics satisfy our <strong>asynchronous</strong> requirement, as they run separately, after middlewares and reducers have processed the action.</p>
+
+<p>Each set of path changes emitted by the state subscription observable is mapped to a call to the native persistence module using the RxJS side effect <code class="language-plaintext highlighter-rouge">tap</code> operator.</p>
+
+<p>Our second requirement is to make sure that our state subscriptions are persisted <strong>in order</strong>. We can accomplish this ordering by changing <code class="language-plaintext highlighter-rouge">tap</code> to a <code class="language-plaintext highlighter-rouge">concatMap</code> and returning our path changes as an inner observable:</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">concatMap</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">rxjs/operators</span><span class="dl">'</span><span class="p">;</span>
+<span class="k">import</span> <span class="p">{</span> <span class="k">from</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">rxjs</span><span class="dl">'</span><span class="p">;</span>
+<span class="k">import</span> <span class="p">{</span> <span class="nx">createStateSubscription</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">epic-state-subscriptions</span><span class="dl">'</span><span class="p">;</span>
+
+<span class="kd">const</span> <span class="nx">persistenceEpic</span> <span class="o">=</span> <span class="p">(</span><span class="nx">action$</span><span class="p">,</span> <span class="nx">state$</span><span class="p">)</span> <span class="o">=&gt;</span>
+  <span class="nx">action$</span><span class="p">.</span><span class="nx">pipe</span><span class="p">(</span>
+    <span class="nx">createStateSubscription</span><span class="p">(</span><span class="nx">state$</span><span class="p">,</span> <span class="p">{</span>
+      <span class="na">paths</span><span class="p">:</span> <span class="p">[</span><span class="dl">'</span><span class="s1">x.y.z</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">a.b.*</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">*.c.d</span><span class="dl">'</span><span class="p">],</span>
+    <span class="p">}),</span>
+    <span class="nx">concatMap</span><span class="p">(</span><span class="nx">paths</span> <span class="o">=&gt;</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="k">from</span><span class="p">(</span><span class="nx">paths</span><span class="p">.</span><span class="nx">map</span><span class="p">({</span> <span class="nx">path</span><span class="p">,</span> <span class="nx">nextState</span> <span class="p">}</span> <span class="o">=&gt;</span> <span class="p">{</span>
+        <span class="nx">NativeLayer</span><span class="p">.</span><span class="nx">persist</span><span class="p">(</span><span class="nx">path</span><span class="p">,</span> <span class="nx">nextState</span><span class="p">);</span>
+      <span class="p">}));</span>
+    <span class="p">})</span>
+  <span class="p">);</span>
+</code></pre></div></div>
+
+<p>Let’s work our way up to the definition of the <code class="language-plaintext highlighter-rouge">concatMap</code> operator:</p>
+
+<ul>
+  <li>The <code class="language-plaintext highlighter-rouge">map</code> operator projects each value emitted from the source observable to a new value.</li>
+  <li>The <code class="language-plaintext highlighter-rouge">mergeMap</code> operator maps each value emitted by the source observable to an inner observable.</li>
+  <li>The <code class="language-plaintext highlighter-rouge">concatMap</code> operator is similar to <code class="language-plaintext highlighter-rouge">mergeMap</code>, but it only subscribes to the next inner observable when the previous one completes.</li>
+</ul>
+
+<p>In our example, <code class="language-plaintext highlighter-rouge">concatMap</code> maps each set of path changes emitted by the source observable to an inner observable of promises using the <code class="language-plaintext highlighter-rouge">from</code> operator. Once the promises all succeed, the inner observable completes
+and <code class="language-plaintext highlighter-rouge">concatMap</code> processes the next value emitted by the source observable.</p>
+
+<p>In this way, we guarantee that the state subscription changes are processed in order and have prevented a slower call to the native layer from clobbering a later call.</p>
+
+<p>All that is left is to make our state subscription epic more <strong>performant</strong>. We can use the <code class="language-plaintext highlighter-rouge">bufferTime</code> operator to throttle the frequency with which we calculate state subscriptions:</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">bufferTime</span><span class="p">,</span> <span class="nx">concatMap</span><span class="p">,</span> <span class="nx">filter</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">rxjs/operators</span><span class="dl">'</span><span class="p">;</span>
+<span class="k">import</span> <span class="p">{</span> <span class="k">from</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">rxjs</span><span class="dl">'</span><span class="p">;</span>
+<span class="k">import</span> <span class="p">{</span> <span class="nx">createStateSubscription</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">epic-state-subscriptions</span><span class="dl">'</span><span class="p">;</span>
+
+<span class="kd">const</span> <span class="nx">SUBSCRIPTION_BUFFER_INTERVAL</span> <span class="o">=</span> <span class="mi">100</span><span class="p">;</span>
+
+<span class="kd">const</span> <span class="nx">persistenceEpic</span> <span class="o">=</span> <span class="p">(</span><span class="nx">action$</span><span class="p">,</span> <span class="nx">state$</span><span class="p">)</span> <span class="o">=&gt;</span>
+  <span class="nx">action$</span><span class="p">.</span><span class="nx">pipe</span><span class="p">(</span>
+    <span class="nx">bufferTime</span><span class="p">(</span><span class="nx">SUBSCRIPTION_BUFFER_INTERVAL</span><span class="p">),</span>
+    <span class="nx">filter</span><span class="p">(</span><span class="nx">actions</span> <span class="o">=&gt;</span> <span class="nx">actions</span><span class="p">.</span><span class="nx">length</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">),</span>
+    <span class="nx">createStateSubscription</span><span class="p">(</span><span class="nx">state$</span><span class="p">,</span> <span class="p">{</span>
+      <span class="na">paths</span><span class="p">:</span> <span class="p">[</span><span class="dl">'</span><span class="s1">x.y.z</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">a.b.*</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">*.c.d</span><span class="dl">'</span><span class="p">],</span>
+    <span class="p">}),</span>
+    <span class="nx">concatMap</span><span class="p">(</span><span class="nx">paths</span> <span class="o">=&gt;</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="k">from</span><span class="p">(</span><span class="nx">paths</span><span class="p">.</span><span class="nx">map</span><span class="p">({</span> <span class="nx">path</span><span class="p">,</span> <span class="nx">nextState</span> <span class="p">}</span> <span class="o">=&gt;</span> <span class="p">{</span>
+        <span class="nx">NativeLayer</span><span class="p">.</span><span class="nx">persist</span><span class="p">(</span><span class="nx">path</span><span class="p">,</span> <span class="nx">nextState</span><span class="p">);</span>
+      <span class="p">}));</span>
+    <span class="p">})</span>
+  <span class="p">);</span>
+</code></pre></div></div>
+
+<p>The <code class="language-plaintext highlighter-rouge">bufferTime</code> operator receives values from the action stream source observable and buffers them together, emitting all of them as an array of values on a fixed interval. Since it emits on that interval regardless of whether values have been received, a <code class="language-plaintext highlighter-rouge">filter</code> is used to make sure that actions occurred within the interval.</p>
+
+<p>The state subscription operator is then notified of the potential change to the Redux store and calculates any path changes to emit.</p>
+
+<h1 id="subscribe">Subscribe!</h1>
+
+<p>We’ve now built a generic solution for subscribing to path changes we care about in the Redux store.</p>
+
+<p>RxJS gives us the power to easily build on top of these path changes, incorporating complex operations like sequencing and buffering with only a few extra operators.</p>
+
+<p>You can <a href="https://github.com/NerdWalletOSS/epic-state-subscriptions">check out the library here</a> to see the full API and examples. That’s all for now!</p>
+
+:ET

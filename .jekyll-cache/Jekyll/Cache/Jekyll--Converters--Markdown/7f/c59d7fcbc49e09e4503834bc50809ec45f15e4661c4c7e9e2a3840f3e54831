@@ -1,0 +1,4 @@
+I"¡<p>The upgrade of React to version 16 caused issues in our repos with dependencies
+that were relying on deprecated functionality that had now been removed.</p>
+
+:ET

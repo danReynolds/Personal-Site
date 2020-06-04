@@ -1,0 +1,72 @@
+I".<p>It is important to ensure that both your development and production environments
+are using the dependencies that you expect. As I’ve found before, Yarn and npm
+behave a little differently.</p>
+
+<!--halt-->
+
+<h1 id="the-need-for-lockfiles">The Need for Lockfiles</h1>
+
+<p>Dependency management is an important factor in developing and deploying reproducible
+builds. In the JavaScript world developers have had the option of using npm shrinkwrap
+for years and in the past year both Yarn and npm have come up with their own automatic
+lockfile solutions with the <code class="language-plaintext highlighter-rouge">yarn.lock</code> and <code class="language-plaintext highlighter-rouge">package-lock.json</code> files respectively.</p>
+
+<p>Theses lockfiles make sure that if you share your code with team members or deploy it
+to production, the packages your project depends on won’t pull in breaking versions that
+authors have published since the time you first worked on and tested the code.</p>
+
+<p>While both package managers use lockfiles to determine your versions, they do not behave exactly the same.</p>
+
+<h1 id="the-yarnlock">The Yarn.lock</h1>
+
+<p>If you run <code class="language-plaintext highlighter-rouge">yarn</code> in a fresh repo with no lockfile and a <code class="language-plaintext highlighter-rouge">package.json</code> it will install your dependencies and
+create a <code class="language-plaintext highlighter-rouge">yarn.lock</code>.</p>
+
+<p>The lockfile can be updated when you run <code class="language-plaintext highlighter-rouge">yarn add/upgrade/remove</code> as well as certains cases of <code class="language-plaintext highlighter-rouge">yarn install</code>. There has been debate around when the lockfile is actually changed on an install and I had initially thought that it could suck down newer versions of packages matching the semantic version range specified in the <code class="language-plaintext highlighter-rouge">package.json</code>, an issue brought up [here]*https://github.com/yarnpkg/yarn/issues/570#issuecomment-257136286). If this was the case then it defeats the purpose of a lockfile, as build servers and other developers could get different versions just by cloning a repo and running <code class="language-plaintext highlighter-rouge">yarn</code>.</p>
+
+<p>After investigating further it became clear when Yarn actually updates the lockfile.</p>
+
+<p>Yarn member thejameskyle recommends that you consider Yarn dependency management to behave like a memoize function:</p>
+
+<blockquote>
+
+  <p>Imagine a memoize function where the input is a package.json and the output is the yarn.lock.</p>
+</blockquote>
+
+<ol>
+  <li>The first time you pass a package.json it creates a yarn.lock and caches the result.</li>
+  <li>The next time you run that same package.json the result will be exactly the same because it is cached.</li>
+  <li>When you change the package.json you’ve invalidated the cache and now the yarn.lock will be recalculated.</li>
+</ol>
+
+<p>It’s more complex than I’ve made it out to be (each package version gets effectively “memoized” individually, changing the version of one package doesn’t invalidate the rest), but hopefully now everyone gets the point.</p>
+
+<p>Each package is effectively going to use the version specified in the lockfile unless it or its parent dependencies was altered in the <code class="language-plaintext highlighter-rouge">package.json</code>, in which case it is going to get the <strong>latest compatible version</strong> even if a different compatible version is already present in the lockfile as described in testing by CrabDude <a href="https://github.com/yarnpkg/yarn/issues/570#issuecomment-274638907">here</a>.</p>
+
+<p>This behavior is much closer to npm than I had originally described, but still slightly different.</p>
+
+<h1 id="the-package-lockjson">The package-lock.json</h1>
+
+<p>The <code class="language-plaintext highlighter-rouge">package-lock.json</code> was only released in npm 5 earlier this year and there has been <strong>a lot</strong> of <a href="https://github.com/npm/npm/issues/17979">back and forth</a> by developers on how its lockfile should work.</p>
+
+<p>At the time of this post, an employee at npm described how it works in version <code class="language-plaintext highlighter-rouge">&gt; 5.4</code> pretty well <a href="https://github.com/npm/npm/issues/17979#issuecomment-332701215">here</a>.</p>
+
+<p>In her explanation she said the following:</p>
+
+<blockquote>
+
+  <ol>
+    <li>If you have a package.json and you run npm i we generate a package-lock.json from it.</li>
+    <li>If you run npm i against that package.json and package-lock.json, the latter will never be updated, even if the package.json would be happy with newer versions.</li>
+    <li>If you manually edit your package.json to have different ranges and run npm i and those ranges aren’t compatible with your package-lock.json then the latter will be updated with version that are compatible with your package.json. Further runs of npm i will be as with 2 above.</li>
+  </ol>
+</blockquote>
+
+<p>Whereas changing a package in the <code class="language-plaintext highlighter-rouge">package.json</code> will always grab the latest compatible version under Yarn and update the lockfile, npm will keep the current version in the lockfile if it is still within the compatible range.</p>
+
+<h1 id="takeaway">Takeaway</h1>
+
+<p>It wasn’t always clear how Yarn and npm treat their dependency management and it took some digging to determine the actual behavior of each package manager.</p>
+
+<p>Hopefully this has made lockfile management a little clearer using either Yarn or npm.</p>
+:ET
