@@ -308,7 +308,7 @@ If we want to remove all unused entities from the cache we can similarly call th
 cache.gc();
 ```
 
-The garbage collection API will remove all entities that are not retained, where retained means that the entity has has `cache.retain` called on it more times than it has been released via `cache.release` or if it is referenced either directly or indirectly by a such a retained entity. The `ROOT_QUERY` object or a normalized entity written directly such as with `writeFragment` will automatically have `retain` called on it. 
+The garbage collection API will remove all entities that are not retained, where retained means that the entity has had `cache.retain` called on it more times than it has been released via `cache.release` or if it is referenced either directly or indirectly by a such a retained entity. The `ROOT_QUERY` object or a normalized entity written directly such as with `writeFragment` will automatically have `retain` called on it. 
 
 `gc` will then recursively search through the values of retained entities to find other entities referenced by them and mark those to be kept as well. All entities not reached by this process will then be removed from the entity store.
 
