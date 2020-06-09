@@ -1,10 +1,12 @@
 ---
-layout: presentation
+layout: post
 title: Examining the Apollo 3 Cache
-image: '/images/tech/managing-complexity.jpg'
+image: '/images/tech/cache.jpg'
 category: Tech
 tags: [JavaScript, Apollo, GraphQL, Cache]
 ---
+
+A look at the new features of the Apollo 3 Cache and how it works under the hood.
 
 <!--halt-->
 
@@ -14,11 +16,8 @@ The Apollo 3 release cut early June and comes with some exciting new cache featu
 
 * Type Policies
 * Modify API
-* Cache eviction
 
 To help us use these APIs, it's good to first examine how the cache works.
-
----
 
 ## Interacting with the Cache
 
@@ -27,8 +26,6 @@ To help us use these APIs, it's good to first examine how the cache works.
 Cache operations are funneled through 4 key layers from the ApolloClient to the underlying data store.
 
 Here we will examine how the cache works by stepping through a `writeQuery` operation.
-
----
 
 ## Layer 1: The Client
 
@@ -58,9 +55,7 @@ apolloClient.writeQuery({
 
 > Note: Every property in our data object we want persisted must also be listed in the query, otherwise it'll not be written.
 
----
-
-### Layer 2: The Cache
+## Layer 2: The Cache
 
 The client relays the `writeQuery` invocation to the cache, calling `cache.writeQuery`. By default, the client uses the Apollo `InMemoryCache`, although
 clients can pass in their own cache to the client as along as it conforms to the base `cache` specification.
@@ -69,9 +64,7 @@ The cache is the last layer that exposes a public interface, with tools for perf
 
 It relays the data from `writeQuery` and calls the underlying `cache.write` API which hands the query data off to the `StoreWriter` module.
 
----
-
-### Layer 3: The StoreWriter
+## Layer 3: The StoreWriter
 
 The StoreWriter's `writeToStore` API is passed the query data and begins processing the writing of the data into the `EntityStore`, the final layer which actually stores
 cached data.
@@ -83,9 +76,7 @@ If a field policy exists for the field processed that is being updated, it will 
 
 It then calls the `EntityStore.merge` API with the merged value in order to persist it in the underlying data store.
 
----
-
-### Layer 4: The EntityStore
+## Layer 4: The EntityStore
 
 The EntityStore is the underlying data store of the cache. It is a class which stores the actual data that gets read and written to and is created by the cache layer. It contains the core private APIs for manipulating and reading stored data.
 
@@ -94,9 +85,7 @@ The entity store structures its data into two groups:
 1. Normalized data entities
 2. Queries
 
----
-
-### Our query
+## Our query
 
 Let's take another look at our query and see how the cache models that data after it is written:
 
@@ -120,9 +109,7 @@ apolloClient.writeQuery({
 });
 ```
 
----
-
-### EntityStore Structure
+## EntityStore Structure
 
 ```ts
 {
@@ -150,9 +137,7 @@ apolloClient.writeQuery({
 All queries are stored under `ROOT_QUERY` and the structure looks pretty similar to the data we wrote. The big difference is that now the data array of Employee entities
 is by reference instead of value.
 
----
-
-### Cache Normalization
+## Cache Normalization
 
 The Apollo cache uses a normalization strategy for types with identifiable ID fields or composite keys. Anything with an Id is stored by reference in queries. This is useful when entities
 referenced by queries change, since the queries do not need to be updated.
@@ -161,9 +146,7 @@ It makes it more challenging, however, for when entities are created or deleted 
 
 While cache normalization might seem like an implementation detail, in Apollo 3 it is important to understand these data structures, since a lot of the public API requires knowledge of references.
 
----
-
-### Type Policies
+## Type Policies
 
 In the `writeQuery` example, we followed through how entities get written into the cache. Apollo 3 type policies allow us to define per-field policies for fine-grained control of exactly what gets written.
 
@@ -187,9 +170,7 @@ const cache = new InMemoryCache({
 Here we've defined a field policy on the Employee type for how its name should be merged into the cache. When the StoreWriter passes the data for the Employee to the EntityStore,
 it will first run the fields through the existing field policies and pass that data down to the data store.
 
----
-
-### Type Policy Options
+## Type Policy Options
 
 Type policies have a number of options for providing fine-grain control for writing fields.
 
@@ -214,9 +195,7 @@ const cache = new InMemoryCache({
 If here for example we didn't want to store any information about minors in the cached query, we can filter it out. The entities read and written in these policies are refs,
 so we need to use `readField` to access fields out of the cache for the ref and `toReference` to write entities down into the cache.
 
----
-
-### Cache.Modify
+## Cache.Modify
 
 Apollo 3 introduces a new API for manipulating data in the cache called `modify`. It is similarly structured to the merge API in the field policy we saw above and operates on cache references.
 If we did not have the field policy from above in place, we could retroactively remove the entity from the query using modify:
@@ -238,9 +217,7 @@ cache.modify({
 
 Modify is also the API of choice for updating a query after a mutation.
 
----
-
-### Modify vs read/write 
+## Modify vs read/write 
 
 In Apollo 2, the common update pattern after a mutation was to write something like:
 
@@ -270,8 +247,6 @@ function AddEmployee() {
 This is problematic because not only do you need to do a verbose read/write pattern, but if your GET_EMPLOYEES query has fewer fields specified than your ADD_EMPLOYEE
 query for example, then you would lose data when writing!
 
----
-
 The modify API makes it easier to perform updates like this:
 
 ```ts
@@ -294,9 +269,7 @@ function AddEmployee() {
 But since it operates on references, it requires more knowledge of how the cache works to be done correctly. A user needs to know that the new employee created must be turned into a reference
 in order to be stored.
 
----
+## That's all for now!
 
-### That's it for now!
-
-That's a first dive into how the cache works and how we can use that knowledge to better take advantage of the new features exposed in Apollo 3.
+This has been a first dive into how the cache works and how we can use that knowledge to better take advantage of the new features exposed in Apollo 3. Next up we'll talk about the new cache eviction API for managing cached entities.
 

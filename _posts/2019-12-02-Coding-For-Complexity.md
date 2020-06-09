@@ -6,6 +6,8 @@ category: Tech
 tags: [JavaScript, xstate, State Machines, statecharts]
 ---
 
+How state machines make it easier to reason about complex application state.
+
 <!--halt-->
 
 ## Writing Good Code
