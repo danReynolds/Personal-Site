@@ -19,7 +19,7 @@ paginate_path: "page:num"
 # About/contact
 author:
   name:              Dan Reynolds
-  description:       I'm Dan, a Software Engineer in San Francisco at NerdWallet.
+  description:       I'm Dan, a Software Engineer in Waterloo, Canada working remotely at NerdWallet.
   email:             me@danreynolds.ca
   github:            https://github.com/danreynolds
 
