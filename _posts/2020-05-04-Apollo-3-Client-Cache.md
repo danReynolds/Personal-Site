@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Examining the Apollo 3 Cache
+title: Deconstructing Apollo Part 1&#58; The Cache
 image: '/images/tech/cache.jpg'
 category: Tech
 tags: [JavaScript, Apollo, GraphQL, Cache]
@@ -314,4 +314,4 @@ The garbage collection API will remove all entities that are not retained, where
 
 ## That's all for now!
 
-This has been a first dive into how the cache works and how we can use that knowledge to better take advantage of the new features exposed in Apollo 3. I'm excited to keep exploring the new features Apollo 3 has to offer and would be happy to chat about it, you can find me on [Twitter](https://twitter.com/TheDerivative).
+This has been a first dive into how the cache works and how we can use that knowledge to better take advantage of the new features exposed in Apollo 3. I'm excited to keep exploring the new features Apollo 3 has to offer. In part 2 we'll take a look at how Apollo uses optimistic mutations to provide instant user feedback.
