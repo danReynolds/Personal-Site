@@ -6,6 +6,8 @@ category: Tech
 tags: [JavaScript, Apollo, GraphQL, Cache, Optimistic]
 ---
 
+The ins-and-outs of Apollo optimistic mutations.
+
 <!--halt-->
 
 # Optimistic updates
@@ -37,7 +39,7 @@ const [
 
 There are a variety of approaches libraries can take to supporting optimistic updating. Let's dive into how it's implemented in the Apollo 3 cache.
 
-## A Tale of two data properties
+## A tale of two data properties
 
 Like most journeys into the inner workings of Apollo, we start at the client layer. As we've discussed before, the client maintains a reference to its internal data store called the EntityStore which holds cached queries.
 
