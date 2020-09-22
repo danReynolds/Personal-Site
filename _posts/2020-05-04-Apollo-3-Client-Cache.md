@@ -190,7 +190,7 @@ const cache = new InMemoryCache({
   }
 ```
 
-In this example we reject storing any employees under the age of 18 in our query, since they're not of working age. The entities read and written in these policies are refs,
+In this example we reject storing any employees under the age of 18 in our query. The entities read and written in these policies are refs,
 so we need to use `readField` to access fields out of the cache for the ref and `toReference` to write entities down into the cache.
 
 ## Cache.Modify
