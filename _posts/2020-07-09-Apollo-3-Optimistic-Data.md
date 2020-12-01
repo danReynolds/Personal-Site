@@ -10,7 +10,7 @@ The ins-and-outs of Apollo optimistic mutations.
 
 <!--halt-->
 
-# Optimistic updates
+# [Optimistic updates](#optimistic-updates)
 
 An email just came into your inbox, you go to check what it is and see that it's just some LinkedIn recruiter trying to get you interested in their series B company with X million in funding and a unique, disruptive take on an industry set to explode in the next couple years. Because you're a rockstar developer and get emails like this all the time, you swipe the email away and it moves to your archives. 
 
@@ -39,7 +39,7 @@ const [
 
 There are a variety of approaches libraries can take to supporting optimistic updating. Let's dive into how it's implemented in the Apollo 3 cache.
 
-## A tale of two data properties
+## [A tale of two data properties](#tale-of-two-data-properties)
 
 Like most journeys into the inner workings of Apollo, we start at the client layer. As we've discussed before, the client maintains a reference to its internal data store called the EntityStore which holds cached queries.
 
@@ -206,7 +206,7 @@ While the `data` reference is restored, the cache's `optimisticData` reference i
   this.optimisticData = this.optimisticData.addLayer(optimisticId, perform);
 ```
 
-## Reading from the optimistic layer
+## [Reading from the optimistic layer](#reading-from-optimistic-layer)
 
 Now that our optimistic response has been layered onto the cache's data store, reads need to be directed to check that optimistic layer. Queries watching for changes to the cache access its data using a `readCache` function calling `cache.diff` to see if there are changes it cares about:
 
@@ -257,7 +257,7 @@ public get(dataId: string, fieldName: string): StoreValue {
 }
 ```
 
-## Peeling off the optimistic layer
+## [Peeling off the optimistic layer](#peeling-off-optimistic-layer)
 
 The cache will continue to read from our optimistic layer for the duration that the mutation is waiting for a response from the server. Once the server response comes back, the `QueryManager` removes the optimistic layer:
 
@@ -346,7 +346,7 @@ The `optimisticData` chain now looks like this:
 
 Root <- Layer 1 <- Layer 2  <- Layer 6 <- **Layer 7**
 
-## *Why not re-use Layer 4 and 5?*
+## [Why not re-use Layer 4 and 5?](#why-not-use-layer-4-5)
 
 Layer 4 and 5 may have relied on data in removed Layer 4 for writes and side-effects executed in their own transactions which the removal of Layer 3 would not know how to undo. Instead, their current data is discarded, and their transactions are re-applied fresh now that Layer 3 has been removed.
 
@@ -354,6 +354,6 @@ For example, suppose that each layer is an optimistic mutation to archive a diff
 
 If we just removed Layer 3, then we'd need to know how to update Layer 4's data to now reference a different email. Instead of having to include these complex data unwinders, it is easier to apply the same operation for archiving subsequent emails again.
 
-## Cache you later
+## [Cache you later](#cache-you-later)
 
 This has been a look at how Apollo incorporates optimistic mutations into its cache model. In part 3 we'll take a look at how data from the cache reaches React components through the `useQuery` hook.

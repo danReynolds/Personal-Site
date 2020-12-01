@@ -10,13 +10,13 @@ A reaction to Apollo 3's new state management solution.
 
 <!--halt-->
 
-# Reactive variables
+# [Reactive variables](#reactive-variables)
 
 As always, Apollo 3 provides its own great [documentation](https://www.apollographql.com/docs/react/local-state/reactive-variables/) on this topic, so I'd encourage anyone looking at this post to first start there. 
 
 If you're still reading this, then I assume you're interested in learning even more about reactive variables and how they tie into the Apollo 3 ecosystem. In this example we'll explore how you can use them to extend an existing server type stored in your client cache with a client-side field.
 
-## Moving past local resolvers
+## [Moving past local resolvers](#moving-past-local-resolvers)
 
 Apollo has provided local state management solutions in the past and if you've worked with Apollo 2, you might be familiar with the now deprecated [local resolvers](https://www.apollographql.com/docs/react/local-state/local-state-management/#local-resolvers-deprecated). Local resolvers offered a way to store additional data in the client cache using a pattern that Apollo 3 developers were already familiar with.
 
@@ -86,7 +86,7 @@ export default {
 
 While this pattern is familiar, it can take a lot of code to extend a type with a single field like this. Let's compare this implementation to another using reactive variables.
 
-## Embracing reactive variables
+## [Embracing reactive variables](#embracing-reactive-variables)
 
 In their documentation, the Apollo team says the following:
 
@@ -135,7 +135,7 @@ export const GetEmployeeById = gql`
 `
 ```
 
-## Reacting to changes
+## [Reacting to changes](#reacting-to-changes)
 
 Any query that includes employees will now re-execute when the `isDeleting` value for their employee changes. This is the *reactive* part of reactive variables and it's what makes them so powerful and multi-purpose throughout your Apollo 3 applications.
 
@@ -199,7 +199,7 @@ The `makeVar` function keeps a list of caches to broadcast to when the value of 
 
 As a client-side field is resolved, the cache records which field is being updated [here](https://github.com/apollographql/apollo-client/blob/master/src/core/LocalState.ts#L378:L378) and associates it with the current reactive variable by calling `varDep(rv)` to tie the current field to the reactive variable. The inner working of the [Optimism](https://github.com/benjamn/optimism) dependency library used by Apollo remain relatively abstruse and I will not and could not dive into how it works yet.
 
-## Using Reactive Variables in Components
+## [Using Reactive Variables in Components](#using-reactive-variables-in-components)
 
 Reactive variables can be used in components with the `useReactiveVar` hook that came out in Apollo 3.2. Let's see how we can consume our `currentlyDeletingEmployees` reactive variable in a frontend experience:
 
@@ -221,7 +221,7 @@ const EmployeeListItem = ({ id, name }) => {
 
 If we were to use the `currentlyDeletingEmployees` object directly in the React component without `useReactiveVar`, then it would not re-render if the value changed. Subscribing to changes to the reactive variable in the component using the `useReactiveVar` hook ensures that the component updates whenever the reactive variable does.
 
-## Working Together, Separately
+## [Working Together, Separately](#working-together-separately)
 
 Apollo listened to the commmunity's desire for an easier way to achieve robust, reactive client state management without having to go through all of the hastle of local resolvers.
 
@@ -232,7 +232,7 @@ While reactive variables are not part of the client cache and their value are no
 
 In many cases, yes, and Apollo certainly hopes so. However, there are some limitations of how Reactive variables work that make them difficult to remedy with the rest of the client cache. Since they are not stored within the client cache, tools like [Apollo cache persist](https://www.google.com/search?q=apollo-cache-persist&oq=apollo-cache-persist&aqs=chrome..69i57j0l6j69i60.3489j0j1&sourceid=chrome&ie=UTF-8) will not work with reactive variables, and there is no current solution for persisting reactive variable state like there are for persisting entities in the client cache.
 
-## State of evolution
+## [State of evolution](#state-of-evolution)
 
 Reactive variables are a fundamentally new API in Apollo 3. While local resolvers were more verbose, they added minimal cognitive overhead for developers who had worked with writing Apollo GraphQL resolvers. Reactive variables are a clever state management solution, but they're very new and because they exist outside the cache, they feel somewhat shoehorned into the Apollo API as a solution to the community's desire for easier state management. 
 

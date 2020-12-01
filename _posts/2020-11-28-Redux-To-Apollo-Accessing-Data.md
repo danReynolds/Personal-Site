@@ -10,7 +10,7 @@ How we migrated from accessing and filtering data using Redux selectors to Apoll
 
 <!--halt-->
 
-# Background
+# [Background](#background)
 
 As part of our organization's migration from our React-Redux code base to client state management using Apollo, we've been exploring how to effectively implement data access patterns, side-effects handling, and other aspects of client state management using GraphQL and Apollo client.
 
@@ -18,7 +18,7 @@ This first post examines how we accomplish effective data access, filtering and 
 
 While we'll briefly touch on where we're coming from with Redux, the solutions are all Apollo based and applicable to any project using Apollo regardless of their familiarity with Redux or other state management solutions.
 
-## Coming from Redux
+## [Coming from Redux](#coming-from-redux)
 
 Our organization made heavy use of Redux to manage data access and over the years we've built up hundreds of selectors that we use in various combinations across our applications. For those unfamiliar with Redux selectors, you can read about them [here](https://redux.js.org/).
 
@@ -58,7 +58,7 @@ const getBankingManagers = (state) => _.intersection(getManagers(state), getBank
 
 Selectors make it easy tools to access what we need to from our data in the shape we want. Now let's compare the tools Apollo gives us to accomplish this goal.
 
-## Moving to Apollo
+## [Moving to Apollo](#moving-to-apollo)
 
 Apollo models its client state using a normalized client-side cache. There's a great [post from their team](https://www.apollographql.com/blog/demystifying-cache-normalization/) on what this means and how it works which I'd recommend folks check out before we get too deeply in the weeds here.
 
@@ -168,7 +168,7 @@ Let's break down the steps it took to do this:
 
 The downside to this approach is that we still hit the network to get our managers, when we would have been fine using the existing cached data we had on all of our employees to get a list of them. Making distinct queries over the network for data we already have available in the cache will slow down the experience for our users and introduce unnecessary network burden.
 
-## Reading from the Apollo Cache
+## [Reading from the Apollo Cache](#reading-from-the-apollo-cache)
 
 Instead of making a query over the network to our GraphQL server, we can use [Apollo 3 field policies](https://www.apollographql.com/docs/react/caching/cache-field-behavior/)
 to access data from the cache.
@@ -228,7 +228,7 @@ When Apollo encounters a field marked with the client directive, it knows not to
 
 So far we've used field policies to to select data off of particular employee entities, but we still haven't seen how we can get all of the managers from the cache like we did with Redux.
 
-## Root Query Field Policies
+## [Root Query Field Policies](#root-query-field-policies)
 
 In addition to defining new fields on types like `Employee`, we can also create custom client-side fields by defining fields on the `Query` type:
 
@@ -301,7 +301,7 @@ query GetManagers {
 }
 ```
 
-## Canonical Fields
+## [Canonical Fields](#canonical-fields)
 
 In our example, we filtered down our list of managers from the cached `employees` field. This is what I call a *canonical field*, a field that represents the entire collection of a particular type on the client from which custom filters and views of that data are derived.
 
@@ -313,7 +313,7 @@ It also makes it difficult to build client-side fields that are supersets of the
 
 By using a canonical field like `employees` that is kept up to date with all instances of a particular entity, we can more easily manage derived fields that represent subsets and transformations on the collection.
 
-## Field Policy Composition
+## [Field Policy Composition](#field-policy-composition)
 
 Client-side field policies can easily be composed together similarly to how we demonstrated with Redux. To get all banking managers like we did in the Redux example, we can write a set of field policies like this:
 
@@ -359,7 +359,7 @@ const cache = new InMemoryCache({
 
 As we can see in the example, our new field policies can reference eachother, making it easy to compose them together to create other field policies as needed. I created a `readEmployees` field policy that parses out the data the raw `employees` field from the GraphQL server so that we don't need to keep doing that in every other field policy.
 
-## Field Policies with Variables
+## [Field Policies with Variables](#field-policies-with-variables)
 
 Instead of having to write a different field policy for each team of employees, it would be handy if we could provide the team to filter by to a single field policy. Custom field policies support variables similarly to any normal query, which we can provide as shown below:
 
@@ -405,7 +405,7 @@ query GetTeamByName($teamName: String!) {
 }
 ```
 
-## Adding Type Safety
+## [Adding Type Safety](#adding-type-safety)
 
 For complex applications with a large number of custom field policies, it is important to have type safety guarantees that around the fields we are reading and the shape of the policy return values. It is especially easy to make a typo on the name of the field you're reading and cause hard to find errors down the road.
 
@@ -494,7 +494,7 @@ const cache = new InMemoryCache({
 
 While this typing is correct, it isn't very helpful because we would need to know what the return value is for `readEmployees` to know that it returns an array and we're still not getting type safety that the field `readEmployees` actually exists.
 
-## Adding Field Policies to the Schema
+## [Adding Field Policies to the Schema](#adding-field-policies-to-the-schema)
 
 In order to get better type safety, we need to add your custom fields to the GraphQL schema. We can do this by defining type policy configs which closely our GraphQL server's remote schema resolvers:
 
@@ -630,7 +630,7 @@ This setup now gives us type safety that:
 
 These typings can help developers increase their confidence when writing field policies and hopefully lead to fewer bugs, especially in larger applications.
 
-## Performance in React
+## [Performance in React](#performance-in-react)
 
 Since like many developers, we use Apollo in the context of a React application, we should also look at the effect our field policy data access approach will have on our application's performance. First we'll briefly cover the performance of a typical Redux setup so that we can compare.
 
@@ -717,7 +717,7 @@ Now all of our selectors in the chain from `getBankingManagers` are memoized and
 
 Given how React-Redux apps can optimize their data accesses in components, let's compare this behavior to how component re-renders work for Apollo queries.
 
-## useQuery Performance
+## [useQuery Performance](#usequery-performance)
 
 > TLDR: There's lots of cachiing and memoization under the hood of the Apollo client that gives our field policies approach good performance out of the box.
 
@@ -834,7 +834,7 @@ Let's revisit the three questions we wanted to explore:
 3. What happens if another query somewhere else in the app is executed? Will our component re-render? What if it affected the data we care about?
   * We now know that when another query triggers a cache write, the cache will broadcast to watchers that **might be dirty**. Let's look at what that means.
 
-## Apollo Cache Dependency Graph
+## [Apollo Cache Dependency Graph](#apollo-cache-dependency-graph)
 
 If Apollo stopped optimizations as we understand the system so far, then whenever the cache was written to, it would calculate diffs for all of its watchers including all components using `useQuery`. This could have performance implications if we have a lot of components using `useQuery` across our application.
 
@@ -957,7 +957,7 @@ When the new manager is written into the `employees` field, the dependency graph
 
 Reflecting on the breakdown of the Apollo caching mechanisms and these examples, we can see that Apollo offers powerful built-in performance optimizations that eliminate the need for any client-side memoization akin to what we had to do with Redux selectors.
 
-## Testing Field Policies
+## [Testing Field Policies](#testing-field-policies)
 
 We've spent a good chunk of time writing field policies and now we need to see how to test them. Given the number of selectors in our applications and the number of field policies we'll need, it's critical that they be easily testable to support an effective migration and future development.
 
@@ -1043,7 +1043,7 @@ As we can see, testing field policies takes three basic steps:
 
 Queries and test data can be shared across tests, making the testing experience pretty simple and straightforward.
 
-## Adopting Field Policies
+## [Adopting Field Policies](#adopting-field-policies)
 
 The goal of this post was to demonstrate how field policies can be used for data access by teams starting out with or migrating to Apollo from other libraries like Redux. We've dug into what problem field policies solve, how they can be composed together, how to safely type them, what their performance implications are, and their testability.
 
