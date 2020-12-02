@@ -721,22 +721,22 @@ Given how React-Redux apps can optimize their data accesses in components, let's
 
 > TLDR: There's lots of caching and memoization under the hood of the Apollo client that gives our field policies approach good performance out of the box.
 
-Apollo queries are typically wired up in React components using the `useQuery` React hook. Our `BankingManagerList` component would look something like this:
+Apollo queries are typically wired up in React components using the `useQuery` React hook. An `EmployeesList` component would look something like this:
 
 ```tsx
 import React from 'react';
 import { gql, useQuery } from '@apollo/client';
 
-const bankingManagersQuery = gql`
-  query GetBankingManagers {
-    managers @client {
+const employeesQuery = gql`
+  query GetEmployees {
+    employees {
       id
       name
     }
   }
 `;
 
-const BankingManagerList = ({ managers }) => {
+const EmployeesList = ({ managers }) => {
   const { data, loading, error } = useQuery(bankingManagersQuery, { fetchPolicy: 'cache-first' });
 
   if (loading) {
@@ -747,11 +747,11 @@ const BankingManagerList = ({ managers }) => {
     return <Error error={error} />;
   }
 
-  const managers = data?.managers ?? [];
+  const employees = data?.employees ?? [];
 
   return (
     <ul>
-      {managers.forEach(manager => <li>{manager.name}</li>)}
+      {employees.forEach(employee => <li>{employee.name}</li>)}
     </ul>
   );
 });
