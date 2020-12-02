@@ -14,13 +14,13 @@ How we migrated from accessing and filtering data using Redux selectors to Apoll
 
 As part of our organization's migration from our React-Redux code base to client state management using Apollo, we've been exploring how to effectively implement data access patterns, side-effects handling, and other aspects of client state management using GraphQL and Apollo client.
 
-This first post examines how we accomplish effective data access, filtering and transformation on the client like we used to through Redux selectors. Our goal is not only to find an Apollo equivalent to what we were able to achieve with Redux selectors, but also reflect on the advantages and disadvantages of this new approach and make sure that it is a step forward in effectively managing our client side data.
+This first post examines how we accomplish effective data access, filtering and transformation on the client like we used to through Redux selectors. Our goal is not only to find an Apollo equivalent to what we were able to achieve with Redux selectors, but also make sure that it is a step forward in effectively managing our client side data.
 
-While we'll briefly touch on where we're coming from with Redux, the solutions are all Apollo based and applicable to any project using Apollo regardless of their familiarity with Redux or other state management solutions.
+While we'll briefly touch on where we're coming from with Redux, the solutions are all Apollo-based and applicable to any project using Apollo regardless of their familiarity with Redux or other state management solutions.
 
 ## [Coming from Redux](#coming-from-redux)
 
-Our organization made heavy use of Redux to manage data access and over the years we've built up hundreds of selectors that we use in various combinations across our applications. For those unfamiliar with Redux selectors, you can read about them [here](https://redux.js.org/).
+Our organization made heavy use of Redux to manage data access and over the years we've built up hundreds of selectors that we use in various combinations across our applications. For those who are unfamiliar with Redux selectors, you can read about them [here](https://redux.js.org/).
 
 Redux isn't a very complicated library, it essentially boils down to a single object `{}` that stores all of your application's state and you can dispatch `actions` to update that global state object however you want. You have complete control over the shape of that global state object. *Selectors* are just utility functions that read, aka *select*, data from that global state object.
 
@@ -60,7 +60,7 @@ Selectors make it easy tools to access what we need to from our data in the shap
 
 ## [Moving to Apollo](#moving-to-apollo)
 
-Apollo models its client state using a normalized client-side cache. There's a great [post from their team](https://www.apollographql.com/blog/demystifying-cache-normalization/) on what this means and how it works which I'd recommend folks check out before we get too deeply in the weeds here.
+Apollo models its client state using a normalized client-side cache. There's a great [post from their team](https://www.apollographql.com/blog/demystifying-cache-normalization/) on what this means and how it works, which I'd recommend folks check out before we get too deeply in the weeds here.
 
 Apollo's version of our cached employees data looks like this:
 
@@ -166,14 +166,14 @@ Let's break down the steps it took to do this:
 3. Our remote server resolved the `managers` field and returned a filtered list of employees
 4. The client cache parsed this response, wrote the managers query to the cache and updated the normalized `Employee:1` entity
 
-The downside to this approach is that we still hit the network to get our managers, when we would have been fine using the existing cached data we had on all of our employees to get a list of them. Making distinct queries over the network for data we already have available in the cache will slow down the experience for our users and introduce unnecessary network burden.
+The downside to this approach is that we still hit the network to get our managers when we would have been fine using the existing cached data we had on all of our employees to get a list of them. Making distinct queries over the network for data we already have available in the cache will slow down the experience for our users and introduce unnecessary network burden.
 
 ## [Reading from the Apollo Cache](#reading-from-the-apollo-cache)
 
 Instead of making a query over the network to our GraphQL server, we can use [Apollo 3 field policies](https://www.apollographql.com/docs/react/caching/cache-field-behavior/)
 to access data from the cache.
 
-A field policy, as described by Apollo's documentation, let's developers:
+A field policy, as described by Apollo's documentation, allows developers to:
 
 > customize how a particular field in your Apollo Client cache is read and written.
 
@@ -224,7 +224,7 @@ query GetEmployees {
 }
 ```
 
-When Apollo encounters a field marked with the client directive, it knows not to send that field over the network and instead resolve it using our field policies against its cached data.
+When Apollo encounters a field marked with the `client` directive, it knows not to send that field over the network and instead resolve it using our field policies against its cached data.
 
 So far we've used field policies to to select data off of particular employee entities, but we still haven't seen how we can get all of the managers from the cache like we did with Redux.
 
@@ -248,9 +248,9 @@ const cache = new InMemoryCache({
 });
 ```
 
-Our client-side `readManagers` field will read cached data from the Apollo cache and transform it into whatever shape we need to represent, achieving the same result as with using selectors. I've prefixed the field with `read` as a convention to make it clear that we're reading from the client cache rather than resolving a field from our remote GraphQL schema.
+Our client-side `readManagers` field will read data from the Apollo cache and transform it into whatever shape we need to represent, achieving the same result as with using selectors. I've prefixed the field with `read` as a convention to make it clear that we're reading from the client cache rather than resolving a field from our remote GraphQL schema.
 
-So how do we actually read the data we want for our query? We need to use the `options.readField` API that Apollo provides in the field policy. The full breakdown of the field policy options are available [here in the Apollo docs](https://www.apollographql.com/docs/react/caching/cache-field-behavior/#fieldpolicy-api-reference). The `readField` API takes 2 parameters, first a `fieldName` to read from the cache and then the `StoreObject` or `Reference` to read it from.
+So how do we actually read the data we want for our query? We need to use the `options.readField` API that Apollo provides in the field policy function. The full breakdown of the field policy options are available [here in the Apollo docs](https://www.apollographql.com/docs/react/caching/cache-field-behavior/#fieldpolicy-api-reference). The `readField` API takes 2 parameters, first a `fieldName` to read from the cache and then the `StoreObject` or `Reference` to read it from.
 
 One handy property of the `readField` API that we can take advantage of is that if you don't pass a 2nd parameter, it defaults to reading the field from the `ROOT_QUERY`. This allows us to read existing fields from our new one:
 
@@ -290,7 +290,7 @@ Let's break down the pattern for writing our client side query into steps:
 4. For each of those employees, we used the `readField` policy again to read their `role` from the employee reference.
 5. If their role was a manager, we returned that employee.
 
-Putting it all together, we're not able to query for our managers anywhere we want in our application using a query like this:
+Putting it all together, we're now able to query for our managers anywhere we want in our application using a query like this:
 
 ```gql
 query GetManagers {
@@ -361,7 +361,7 @@ As we can see in the example, our new field policies can reference eachother, ma
 
 ## [Field Policies with Variables](#field-policies-with-variables)
 
-Instead of having to write a different field policy for each team of employees, it would be handy if we could provide the team to filter by to a single field policy. Custom field policies support variables similarly to any normal query, which we can provide as shown below:
+Instead of having to write a different field policy for each team of employees, it would be handy if we could provide the team to filter by to a single field policy. Field policies support variables similarly to any normal query, which we can provide as shown below:
 
 ```typescript
 const cache = new InMemoryCache({
@@ -394,7 +394,7 @@ const cache = new InMemoryCache({
 });
 ```
 
-As shown in the `readBankingTeam` field policy, we can use an alternative object parameter to the `readField` API in order to pass any variables we need when reading that field. A query on this field would look like this:
+As shown in the `readBankingTeam` field policy, we can use an alternative object parameter to the `readField` API in order to pass any variables we need when reading that field. A query on this field would then look like this:
 
 ```gql
 query GetTeamByName($teamName: String!) {
@@ -407,7 +407,7 @@ query GetTeamByName($teamName: String!) {
 
 ## [Adding Type Safety](#adding-type-safety)
 
-For complex applications with a large number of custom field policies, it is important to have type safety guarantees that around the fields we are reading and the shape of the policy return values. It is especially easy to make a typo on the name of the field you're reading and cause hard to find errors down the road.
+For complex applications with a large number of field policies, it is important to have type safety guarantees for the fields we are reading and the shape of the policy return values. It is especially easy to make a typo on the name of the field you're reading and cause hard to find errors down the road.
 
 We added type safety to our field policies using the [GraphQL code generator](https://graphql-code-generator.com/) library, which will generate TypeScript types for each type in your GraphQL schema and each of your queries.
 
@@ -444,21 +444,21 @@ export type Employee = {
 }
 ```
 
-It will additionlaly define separate types for all enums and referenced GraphQL schema types. Additionally, if we are using the [Apollo helpers plugin](https://graphql-code-generator.com/docs/plugins/typescript-apollo-client-helpers), we'll also get types for our field policies that look like this:
+It will define separate types for all enums and referenced GraphQL schema types and additionally if we are using the [Apollo helpers plugin](https://graphql-code-generator.com/docs/plugins/typescript-apollo-client-helpers), we'll also get types for our field policies that look like this:
 
 ```typescript
 export type TypedTypePolicies = TypePolicies & {
-	Query?: {
-		keyFields?: false | QueryKeySpecifier | (() => undefined | QueryKeySpecifier),
-		queryType?: true,
-		mutationType?: true,
-		subscriptionType?: true,
-		fields?: QueryFieldPolicy,
-	},
+  Query?: {
+    keyFields?: false | QueryKeySpecifier | (() => undefined | QueryKeySpecifier),
+    queryType?: true,
+    mutationType?: true,
+    subscriptionType?: true,
+    fields?: QueryFieldPolicy,
+  },
 };
 
 export type QueryFieldPolicy = {
-	readManagers?: FieldPolicy<any> | FieldReadFunction<any>,
+  readManagers?: FieldPolicy<any> | FieldReadFunction<any>,
   ...
 }
 ```
@@ -525,7 +525,7 @@ const schema: TypePoliciesSchema = {
 }
 ```
 
-The `TypedTypePolicies` type from earlier has come in handy here, as we now get type safety around the keys and options passed to our field policy. But we're still not quite there in terms of thorough type safety. In order to make Apollo and the codegen aware of these schema definitions, we just pass them in as the `typeDefs` option to Apollo client:
+The `TypedTypePolicies` type from earlier has come in handy here, as we now get type safety around the keys and options passed to our field policy. In order to make Apollo and the codegen aware of these schema definitions, we just pass them in as the `typeDefs` option to Apollo client:
 
 ```typescript
 import EmployeeTypePoliciesSchema from './employee-type-policies';
@@ -536,7 +536,7 @@ const apolloClient = new ApolloClient({
 });
 ```
 
-Our next step involves defining a few custom utility types and helpers:
+But we're still not quite there in terms of thorough type safety. Our next step involves defining a few custom utility types and helpers:
 
 ```typescript
 type DeepReference<X> = X extends Record<string, any>
@@ -619,9 +619,9 @@ export type Query = {
 }
 ```
 
-The last change our `readField` API makes is changing the return type. While the `Query` object is correct that `readEmployees` would return an array of employees as part of a  query, in the context of `readField` we know that these will be references, so our `DeepReference` recursively converts any types in the `Array<Employee>` return type into references for us.
+The last change our `readField` API makes is modifying the return type. While the `Query` object is correct that `readEmployees` would return an array of employees as part of a  query, in the context of `readField` we know that these will be references, so our `DeepReference` recursively converts any types in the `Array<Employee>` return type into references for us.
 
-> Note: You may have noticed that the DeepReference utility determines whether an object should be a Reference by the presence of an ID field, which won't always be correct if your type uses a different set of keys for its ID but this is correct most of the time and 100% of our use cases so far.
+> Note: The DeepReference utility determines whether an object should be a Reference by the presence of an ID field, which won't always be correct if your type uses a different set of keys for its ID but this is correct most of the time depending on your app and 100% of our use cases so far.
 
 This setup now gives us type safety that:
 
@@ -668,7 +668,7 @@ But if re-render computation is a performance concern in your component, then th
 
 > React Redux implements several optimizations to ensure your actual component only re-renders when actually necessary. One of those is a shallow equality check on the combined props object generated by the mapStateToProps and mapDispatchToProps arguments passed to connect. Unfortunately, shallow equality does not help in cases where new array or object instances are created each time mapStateToProps is called
 
-Our `getBankingManagers` selector returns a new object every time it is evaluted, regardless of whether the managers have changed. To solve this problem, we use the [Reselect](https://github.com/reduxjs/reselect) library in our application.
+Our `getBankingManagers` selector returns a new array every time it is evaluated, regardless of whether the managers have changed. To solve this problem, we use the [Reselect](https://github.com/reduxjs/reselect) library in our application.
 
 Reselect provides a `createSelector` function for memoizing selectors based on their inputs. We can see what it looks like when applied to our `getBankingManagers` below:
 
@@ -713,13 +713,13 @@ export const getBankingManagers = (state) => createSelector(
 )
 ```
 
-Now all of our selectors in the chain from `getBankingManagers` are memoized and the base selector, `getEmployees`, will return a static array if it has no value. It does add extra overhead when writing selectors so it can be done as necessary. Our application, for example, has hundreds of selectors that we have tried to keep memoized because of performance concerns we've encountered in the past.
+Now all of our selectors in the chain from `getBankingManagers` are memoized and the base selector, `getEmployees`, will return a static array if it has no value. This whole memoization process does add extra overhead when writing selectors so it can be done as necessary. Our application, for example, has hundreds of selectors that we have tried to keep memoized because of performance concerns we've encountered in the past.
 
-Given how React-Redux apps can optimize their data accesses in components, let's compare this behavior to how component re-renders work for Apollo queries.
+Given how React-Redux apps can optimize their data accesses in components, let's compare this behaviour to how component re-renders work for Apollo queries.
 
 ## [useQuery Performance](#usequery-performance)
 
-> TLDR: There's lots of cachiing and memoization under the hood of the Apollo client that gives our field policies approach good performance out of the box.
+> TLDR: There's lots of caching and memoization under the hood of the Apollo client that gives our field policies approach good performance out of the box.
 
 Apollo queries are typically wired up in React components using the `useQuery` React hook. Our `BankingManagerList` component would look something like this:
 
@@ -773,8 +773,8 @@ Query comes back successfully, deliver to component:
 
 When the query comes back successfully, our component re-renders and receives the data from Apollo. We still have a couple open questions:
 
-1. How does Apollo trigger a re-render of the component when the query completed?
-2. Will the `useQuery` hook read data from the cache every time the component re-renders from prop or state changes?
+1. How does Apollo trigger a re-render of the component when the query completes?
+2. Will the `useQuery` hook re-read data from the cache every time the component re-renders from prop or state changes?
 3. What happens if another query somewhere else in the app is executed? Will our component re-render? What if it affected the data we care about?
 
 To answer these questions, we need to explore the Apollo client implementation. Here's a basic diagram of the modules of the Apollo client involved in getting a component it's data:
@@ -783,24 +783,24 @@ To answer these questions, we need to explore the Apollo client implementation. 
 
 Let's breakdown each of these modules by their role in delivering data to our component.
 
->Note: many of these modules do much more than what I've listed out here, but I've tried to streamline the behavior to how it plays into getting our components data. I'm also not an Apollo engineer and I'm sure they could break this down more accurately.
+>Note: many of these modules do much more than what I've listed out here, but I've tried to streamline the details to the role they play in getting our component its data. I'm also not an Apollo engineer and I'm sure they could break this down more accurately.
 
 1. **useBaseQuery**:
   * The `useQuery` hook is just a wrapper around the `useBaseQuery` hook.
-  * On first render, it sets up a `QueryData` and passes it a `forceUpdate` function to trigger re-renders when the data the query cares about changes
-  * When `forceUpdate` is called, it reads the latest data from `QueryData` and rerenders
-  * It caches the result from `QueryData`, only re-rendering when `forceUpdate` is called or the hook options like `variables` or `fetchPolicy` changes.
+  * On first render, it sets up a `QueryData` instance and passes it a `forceUpdate` function that can be used to trigger re-renders when the data the query cares about changes.
+  * When `forceUpdate` is called, it reads the latest data from `QueryData` and re-renders.
+  * It caches the result from `QueryData`, only re-rendering when `forceUpdate` is called or hook options like `variables` or `fetchPolicy` changes.
 
 2. **QueryData**:
-  * Class which maps 1:1 with a query set up in a component
-  * Sits between the component and the cache and handles data retrieval for the component
+  * Class which maps 1:1 with a query set up in a component.
+  * Sits between the component and the cache and handles data retrieval for the component.
   * On instantiation, its tells the `QueryManager` to set up a `watchQuery` on the GraphQL document that the component cares about and subscribes to changes
   * to the observable returned by `watchQuery`.
   * Gatekeeps what data the component receives, only telling the query to update if the data the cache sends it passes a **deep equality** diff.
 
 3. **QueryManager**:
-  * Manages all query subscriptions across the application setup through the `watchQuery` API
-  * When `watchQuery` is called, it creates a `QueryInfo` object passing the GraphQL document from `QueryData` as well as an observable that `QueryInfo` can notify
+  * Manages all query subscriptions across the application setup through the `watchQuery` API.
+  * When `watchQuery` is called, it creates a `QueryInfo` object, passing it the GraphQL document from `QueryData` as well as an observable that `QueryInfo` can notify
   when data related to the document has changed in the cache. It returns this observable to `QueryData` so that it can receive updates.
   * Maintains a map of all active `QueryInfo` objects by query ID.
 
@@ -809,20 +809,20 @@ Let's breakdown each of these modules by their role in delivering data to our co
   * When the diff against the cache is dirty, it notifies the observable set up by the `QueryManager`.
 
 5. **Cache**:
-  * The cache maintains all client data returned by queries and mutations as well as the normalized data entities.
-  * Whenever it is written to, it broadcasts that data has changed to all watchers that might be dirty
+  * The cache maintains all query and mutation responses as well as the normalized data entities.
+  * Whenever it is written to, it broadcasts that data has changed to all watchers that might be dirty.
 
 Now that we have identified the core modules involved in querying for data from our component, let's see what happens when the query we set up in `BankingManagerList`
 comes back from the network:
 
 ![Apollo Query Diagram](/images/tech/apollo-query-diagram.png)
 
-1. The data gets written into the cache by the `cache.write` API
-2. The `write` API calls `broadcastWatches()` to let subscribed watchers of the cache know that there has been a change
+1. The data gets written into the cache by the `cache.write` API.
+2. The `write` API calls `broadcastWatches()` to let subscribed watchers of the cache know that there has been a change.
 3. `broadcastWatches` calls `maybeBroadcastWatch` for each watcher, which will filter down the list of watchers to **only the ones that might be dirty** (more on how it determines this later).
-4. For each `QueryInfo` watcher that might be dirty, the cache calls the `QueryInfo`'s provided callback with the cache diff for the its query document.
+4. For each `QueryInfo` watcher that might be dirty, the cache calls the `QueryInfo`'s provided callback with a cache diff for the its query document.
 5. If the diff from the cache is shallowly different, the `QueryInfo` instance notifies the observable set up by the `QueryManager`.
-6. The `QueryData` subscribed to this observable receives the diff and performs that **deep equality** check against its current data to see if it should tell the componet to `forceUpdate`.
+6. The `QueryData` subscribed to this observable receives the diff and performs a **deep equality** check against its current data to see if it should tell the component to `forceUpdate`.
 7. When `forceUpdate` is called, the component re-renders and calls `QueryData.execute` to read the new data waiting for it.
 
 Let's revisit the three questions we wanted to explore:
@@ -830,13 +830,13 @@ Let's revisit the three questions we wanted to explore:
 1. How does Apollo trigger a re-render of the component when the query completed?
   * We've now gone through how this works.
 2. Will the `useQuery` hook read data from the cache every time the component re-renders from prop or state changes?
-  * Nope! It will only re-render if `forceUpdate` is called or the options to the hook change.
+  * Nope! It will only re-read data if `forceUpdate` is called or the options to the hook change.
 3. What happens if another query somewhere else in the app is executed? Will our component re-render? What if it affected the data we care about?
   * We now know that when another query triggers a cache write, the cache will broadcast to watchers that **might be dirty**. Let's look at what that means.
 
 ## [Apollo Cache Dependency Graph](#apollo-cache-dependency-graph)
 
-If Apollo stopped optimizations as we understand the system so far, then whenever the cache was written to, it would calculate diffs for all of its watchers including all components using `useQuery`. This could have performance implications if we have a lot of components using `useQuery` across our application.
+If Apollo stopped optimizing accessing cached data as we understand the system so far, then whenever the cache was written to, it would calculate diffs for all of its watchers which includes a watcher fo each component using `useQuery`. This could have performance implications if we have a lot of components using `useQuery` across our application.
 
 To get around this problem, Apollo uses a dependency graph that tracks the dependencies of a field as they are read. Let's look at our `readBankingManagers` field policy again:
 
@@ -933,7 +933,7 @@ client.writeFragment({
 });
 ```
 
-When a new employee is written to the cache using `writeFragment`, none of the fields in our dependency graph have been affected since it is not included in any of our employees responses and only lives as a normalized entity. The subsequent call to `broadcastWatches` would therefore skip over re-calcuating the diff for the `GetBankingManagers` query.
+When a new employee is written to the cache using `writeFragment`, none of the fields in our dependency graph have been affected since it is not included in any of our employees responses and only exists as a normalized entity. The subsequent call to `broadcastWatches` would therefore skip over re-calcuating the diff for the `GetBankingManagers` query.
 
 3. The new manager is then added to the `employees` field
 
@@ -955,7 +955,7 @@ client.modify({
 
 When the new manager is written into the `employees` field, the dependency graph for the field is dirtied and now when `broadcastWatches` is called, the cache will re-calculate the diff for the employees field and deliver it to `QueryData`. `QueryData` will do a deep equality check on the diff and see that there is a new employee, telling the component to update.
 
-Reflecting on the breakdown of the Apollo caching mechanisms and these examples, we can see that Apollo offers powerful built-in performance optimizations that eliminate the need for any client-side memoization akin to what we had to do with Redux selectors.
+Reflecting on the breakdown of the Apollo caching mechanisms and these examples, we can see that Apollo offers powerful built-in performance optimizations that eliminate the need for the sort of client-side memoization akin to what we had to do with Redux selectors.
 
 ## [Testing Field Policies](#testing-field-policies)
 
@@ -1035,11 +1035,11 @@ describe('employees field policies', () => {
 })
 ```
 
-As we can see, testing field policies takes three basic steps:
+As we can see, testing field policies can be accomplished in three basic steps:
 
-1. Set up the Apollo cache with your field policies before the tests
-2. Write the data needed for the test case to the cache using `cache.writeQuery`
-3. Read the field being tested from the cache using `cache.readQuery` and assert that it returns the correct data
+1. Set up the Apollo cache with your field policies before the tests.
+2. Write the data needed for the test case to the cache using `cache.writeQuery`.
+3. Read the field being tested from the cache using `cache.readQuery` and assert that it returns the correct data.
 
 Queries and test data can be shared across tests, making the testing experience pretty simple and straightforward.
 
@@ -1047,7 +1047,7 @@ Queries and test data can be shared across tests, making the testing experience 
 
 The goal of this post was to demonstrate how field policies can be used for data access by teams starting out with or migrating to Apollo from other libraries like Redux. We've dug into what problem field policies solve, how they can be composed together, how to safely type them, what their performance implications are, and their testability.
 
-We will re-visit the topic again in the future as we expand our usage of field policies in our applications to provide further learnings. Hopefully this breakdown has empowered teams to feel confident using these policies to manage access of their client side data and made the integration of Apollo to their client tech stack a little clearer.
+We will re-visit the topic again in the future as we expand our usage of field policies in our applications to provide further learnings. Hopefully this breakdown has empowered teams to feel confident using these policies to manage access of their client-side data and made the integration of Apollo to their client tech stack a little clearer.
 
 That's it for now!
 
