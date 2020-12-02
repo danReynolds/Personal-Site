@@ -814,7 +814,7 @@ Let's revisit the three questions we wanted to explore:
 
 ## [Apollo Cache Dependency Graph](#apollo-cache-dependency-graph)
 
-If Apollo stopped optimizing accessing cached data as we understand the system so far, then whenever the cache was written to, it would calculate diffs for all of its watchers which includes a watcher fo each component using `useQuery`. This could have performance implications if we have a lot of components using `useQuery` across our application.
+If Apollo stopped optimizing accessing cached data as we understand the system so far, then whenever the cache was written to, it would calculate diffs for all of its watchers which includes a watcher for each component using `useQuery`. This could have performance implications if we have a lot of components using `useQuery` across our application.
 
 To get around this problem, Apollo uses a dependency graph that tracks the dependencies of a field as they are read. Let's look at our `readBankingManagers` field policy again:
 
