@@ -294,7 +294,7 @@ Putting it all together, we're now able to query for our managers anywhere we wa
 
 ```gql
 query GetManagers {
-  managers @client {
+  readManagers @client {
     id
     name
   }
@@ -429,7 +429,7 @@ type Employee {
   id: ID!
   name: String!
   team: EmployeeTeam!
-  role: EmployeeRoles!
+  role: EmployeeRole!
 }
 ```
 
