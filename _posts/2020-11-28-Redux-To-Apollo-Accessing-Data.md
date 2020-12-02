@@ -749,7 +749,7 @@ const BankingManagersList = ({ managers }) => {
 });
 ```
 
-When the query comes back successfully, our component re-renders and receives the data from Apollo. We still have a couple open questions:
+After the query is executed, our component re-renders and receives the data from Apollo. We still have a couple open questions:
 
 1. How does Apollo trigger a re-render of the component when the query completes?
 2. Will the `useQuery` hook re-read data from the cache every time the component re-renders from prop or state changes?
