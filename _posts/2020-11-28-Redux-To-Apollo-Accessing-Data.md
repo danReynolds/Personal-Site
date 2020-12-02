@@ -721,55 +721,33 @@ Given how React-Redux apps can optimize their data accesses in components, let's
 
 > TLDR: There's lots of caching and memoization under the hood of the Apollo client that gives our field policies approach good performance out of the box.
 
-Apollo queries are typically wired up in React components using the `useQuery` React hook. An `EmployeesList` component would look something like this:
+Apollo queries are typically wired up in React components using the `useQuery` React hook. A `BankingManagersList` component would look something like this:
 
 ```tsx
 import React from 'react';
 import { gql, useQuery } from '@apollo/client';
 
-const employeesQuery = gql`
-  query GetEmployees {
-    employees {
+const bankingManagersQuery = gql`
+  query ReadBankingManagers {
+    readBankingManagers @client {
       id
       name
     }
   }
 `;
 
-const EmployeesList = ({ managers }) => {
-  const { data, loading, error } = useQuery(bankingManagersQuery, { fetchPolicy: 'cache-first' });
+const BankingManagersList = ({ managers }) => {
+  const { data, loading, error } = useQuery(bankingManagersQuery, { fetchPolicy: 'cache-only' });
 
-  if (loading) {
-    return <Spinner />;
-  }
-
-  if (error) {
-    return <Error error={error} />;
-  }
-
-  const employees = data?.employees ?? [];
+  const managers = data?.readBankingManagers ?? [];
 
   return (
     <ul>
-      {employees.forEach(employee => <li>{employee.name}</li>)}
+      {managers.forEach(manager => <li>{manager.name}</li>)}
     </ul>
   );
 });
 ```
-
-Assuming we don't yet have the data in the cache, the lifecycle of the `useQuery` hook will be something like this:
-
-Cache miss, send query over the network:
-
-| data | error | loading |
-|------|:-----:| -------:|
-| null | null  | true    |
-
-Query comes back successfully, deliver to component:
-
-| data  | error | loading |
-|-------|:-----:| -------:|
-| {...} | null  | false   |
 
 When the query comes back successfully, our component re-renders and receives the data from Apollo. We still have a couple open questions:
 
