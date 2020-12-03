@@ -6,7 +6,7 @@ category: Tech
 tags: [Flutter, Google, Billing]
 ---
 
-Putting together the documentation to get working Billing setup.
+Putting together the documentation to get a working Google Play Billing setup.
 
 <!--halt-->
 
