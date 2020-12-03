@@ -385,7 +385,7 @@ const cache = new InMemoryCache({
         },
         readBankingTeam: {
           read(bankingTeam, { readField }) {
-            return readField({ fieldName: 'readBankingTeam', variables: { teamName: 'Banking' } });
+            return readField({ fieldName: 'readTeamByName', variables: { teamName: 'Banking' } });
           }
         }
       },
@@ -709,7 +709,7 @@ const getManagers = createSelector(
 
 export const getBankingManagers = (state) => createSelector(
   [getBankingEmployees, getManagers],
-  (bankingEmployees, managers) => _.intersection(bankingEmployees, managers;
+  (bankingEmployees, managers) => _.intersection(bankingEmployees, managers),
 )
 ```
 
