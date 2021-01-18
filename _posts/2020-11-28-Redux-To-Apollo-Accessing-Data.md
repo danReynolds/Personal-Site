@@ -719,7 +719,7 @@ Given how React-Redux apps can optimize their data accesses in components, let's
 
 ## [useQuery Performance](#usequery-performance)
 
-> TLDR: There's lots of caching and memoization under the hood of the Apollo client that gives our field policies approach good performance out of the box.
+> TLDR: There's lots of caching and memoization under the hood of the Apollo client that gives our field policies good performance out of the box.
 
 Apollo queries are typically wired up in React components using the `useQuery` React hook. A `BankingManagersList` component would look something like this:
 
