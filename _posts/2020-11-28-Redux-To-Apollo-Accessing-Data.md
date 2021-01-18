@@ -492,11 +492,11 @@ const cache = new InMemoryCache({
 
 **But wait**! This is not actually the correct typing for `readField('readEmployees')` because as we know, cached queries contain *references*. So a correct typing would be `readField<Reference[]>('readEmployees')` with `Reference` being imported from `@apollo/client`.
 
-While this typing is correct, it isn't very helpful because we would need to know what the return value is for `readEmployees` to know that it returns an array and we're still not getting type safety that the field `readEmployees` actually exists.
+While this typing is correct, it isn't very helpful because we would need to know what the return value is for `readEmployees` to know that it returns an array and even then, we're still not getting type safety that the field `readEmployees` actually exists.
 
 ## [Adding Field Policies to the Schema](#adding-field-policies-to-the-schema)
 
-In order to get better type safety, we need to add your custom fields to the GraphQL schema. We can do this by defining type policy configs which closely our GraphQL server's remote schema resolvers:
+In order to get better type safety, we need to add our custom fields to the GraphQL schema. We can do this by defining type policy configs which closely resemble our GraphQL server's remote schema resolvers:
 
 ```typescript
 import { DocumentNode } from 'graphql';
