@@ -13,7 +13,8 @@ and side-effects when moving from Redux to Apollo.
 
 # Background
 
-In part 1 of this series, we examined how we can use Apollo type policies to accomplish effective client-side data access like we had with our Redux selectors.
+In part 1 of this series, we examined how we can use Apollo type policies to accomplish effective client-side data access like we had with our Redux selectors. Now that we know how to access the data in our Apollo application, we need to explore the ways to manage the lifecycle of that data. This is especially interesting for client-side data
+that is highly relational, 
 
 The Apollo 3 cache is a great tool for managing the data returned by your application's GraphQL queries. As a normalized data cache,
 it stores the entities returned by queries by reference in the cache. A query to fetch a list of employees and their messages might look like this:
