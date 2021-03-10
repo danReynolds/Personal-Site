@@ -16,7 +16,7 @@ Pollyn is a referral sharing app where people can post referral codes and let th
 
 If you have referral codes sitting around collecting dust or would like to explore what referrals are out there for the services you’re interested in then feel free to [check it out.](https://www.pollyn.app/)
 
-I'm a professional mobile developer currently working on this project in my free time and would welcome feedback in the app or to dan@pollyn.app. If you have a product, design or business background and would like to collaborate, don't hesitate to reach out.
+I'm a professional mobile developer currently working on this project in my free time and would welcome feedback in the app or to [dan@pollyn.app](mailto:dan@pollyn.app). If you have a product, design or business background and would like to collaborate, don't hesitate to reach out.
 
 ## Why a referral sharing app?
 
