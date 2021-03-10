@@ -14,9 +14,9 @@ A dive into why and how I went about building Pollyn - the referral sharing app.
 
 Pollyn is a referral sharing app where people can post referral codes and let their friends use them when they need them. You can choose to have your referrals visible to the larger community or just your friends that you add in the app, but you will always see referrals from your friends first.
 
-If you have referral codes sitting around collecting dust or would like to explore what bonuses are out there for services you're interested in feel free to [check it out](https://www.pollyn.app/)
+If you have referral codes sitting around collecting dust or would like to explore what referrals are out there for the services you’re interested in then feel free to [check it out.](https://www.pollyn.app/)
 
-Don't hesitate to give feedback in the app or at [dan@pollyn.app](mailto:dan@pollyn.app) and if you have a product, design or business background and would like to collaborate, I'd welcome folks to reach out.
+I'm a professional mobile developer currently working on this project in my free time and would welcome feedback in the app or to dan@pollyn.app. If you have a product, design or business background and would like to collaborate, don't hesitate to reach out.
 
 ## Why a referral sharing app?
 
