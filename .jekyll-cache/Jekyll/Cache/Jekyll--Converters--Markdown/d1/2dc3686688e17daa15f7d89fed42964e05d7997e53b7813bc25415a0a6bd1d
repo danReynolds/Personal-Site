@@ -968,7 +968,7 @@
 <span class="nx">_isUTC</span><span class="p">:</span> <span class="kc">false</span>
 <span class="nx">_isValid</span><span class="p">:</span> <span class="kc">true</span>
 <span class="nx">_locale</span><span class="p">:</span> <span class="nx">Locale</span> <span class="p">{</span><span class="nl">_calendar</span><span class="p">:</span> <span class="p">{</span><span class="err">…</span><span class="p">},</span> <span class="err">…</span><span class="p">}</span>
-<span class="nl">_pf</span><span class="p">:</span> <span class="p">{</span><span class="na">empty</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span> <span class="na">unusedTokens</span><span class="p">:</span> <span class="nb">Array</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="err">…</span><span class="p">}</span>
+<span class="nl">_pf</span><span class="p">:</span> <span class="p">{</span><span class="nl">empty</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span> <span class="nx">unusedTokens</span><span class="p">:</span> <span class="nb">Array</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="err">…</span><span class="p">}</span>
 <span class="nl">_z</span><span class="p">:</span> <span class="kc">null</span>
 </code></pre></div></div>
 
