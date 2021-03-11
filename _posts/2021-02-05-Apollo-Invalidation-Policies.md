@@ -59,13 +59,13 @@ function employees(state = { employees: [] }, action) {
 ```
 
 When a `GET_EMPLOYEES` action is fired and comes back from the server, the reducer extracts its payload and mutates the state of the `employees` slice of the Redux store
-to now include those employees. As we've talked about in previous post on accessing data, these employees can then be read from the Redux store using selectors.
+to now include those employees. As we've talked about in the previous post on accessing data, these employees can then be read from the Redux store using selectors.
 
-If an employee were to be deleted using a `DELETE_EMPLOYEE` action, the reducer removes that employee from the list of employees.
+If an employee was then to be deleted using a `DELETE_EMPLOYEE` action, the reducer removes that employee from the list of employees.
 
 As we can see, updating state with Redux is all manual and in the hands of the developer. One advantage to data mutation with Redux is that its very clear what is going on and there isn't much library magic doing things under the hood.
 
-This also acts as a disadvantage though as it means that the burden of handling all of these state updates is on the developer, adding to the amount of effort and code to maintain wtih each additional data mutation.
+This also acts as a disadvantage though, as it means that the burden of handling all of these state updates is on the engineer, adding to the amount of effort and code to maintain wtih each additional data mutation.
 
 ## Mutating Data with Apollo
 
@@ -171,7 +171,7 @@ and it is represented in the cache like this:
 }
 ```
 
-It can then be accessed in the a basic React component as shown below:
+It can then be accessed in a basic React component as shown below:
 
 ```tsx
 import React from 'react';
@@ -266,7 +266,7 @@ const deleteEmployee = (deleteEmployeeId: string) => {
 
 Charlie's normalized employee entity has now been removed from the cache and we can move on from the topic of cache eviction right? Well, not quite.
 
-First we need to understand what happens to our cached `employees` and `teams` queries that contained references to the evicted employee. Apollo calls these references to normalized entities that are no longer in the cache *dangling references* and there are a couple approaches to dealing with them.
+First we need to understand what happens to our cached `employees` and `teams` queries that contained references to the evicted employee. Apollo calls these references to normalized entities that are no longer in the cache *dangling references* and there are a couple of approaches to dealing with them.
 
 ## Leave-and-filter approach
 
@@ -309,7 +309,7 @@ So where does that leave us? Are all our cache invalidation issues resolved? Aga
 
 So how can we tell our existing UIs to update after an entity is evicted? We'll need to explore an alternative method.
 
-## Evict-on-Write approach
+## Evict-on-write approach
 
 Instead of leaving the dangling references in the cache, this time we'll explicitly remove the deleted employee reference. This will require us to additionally:
 
@@ -372,16 +372,16 @@ The [modify API](https://www.apollographql.com/docs/react/caching/cache-interact
 
 Now any queries that had accessed the `employees` field or the `members` or `manager` of the `Team:2` entity will re-execute and our UI will correctly update to remove our deleted employee.
 
-While this works, it has a couple shortcomings:
+While we've solved some of our problems, this approach still has a couple shortcomings:
 
 1. We're co-locating a lot of business logic with our `delete` mutation in our component. Ideally our component should just be able to call a delete mutation and not have to worry about removing entities from various places in our cache.
 
 2. How did we know that `Team:2` was the correct team to remove Charlie's `Employee:3` entity from? We often won't have context like that when deleting entities, and we'd need to somehow iterate through all possible teams to see if any of them included it. 
 
-To resolve these issues, we've created a cache invalidation companion library to ApolloClient that helps to better codify relationships betweens entities in the cache.
+To resolve these issues, we've created a cache invalidation companion library to ApolloClient at NerdWallet that helps to better codify relationships betweens entities in the cache.
 ## Apollo invalidation policies
 
-The [Apollo invalidation policies](https://github.com/NerdWalletOSS/apollo-invalidation-policies) library is an extension of the Apollo 3 cache that provides a framework for managing the lifecycle and relationships of cache data through the new concept of invalidation policies.
+The [Apollo invalidation policies](https://github.com/NerdWalletOSS/apollo-invalidation-policies) library is an extension of the Apollo 3 cache that provides a framework for managing the lifecycle and relationships of cache data through the concept of invalidation policies.
 
 Like type policies, invalidation policies are declared for typenames of your GraphQL schema and form relationships between different types. The full API looks like this:
 
@@ -405,7 +405,7 @@ const cache = new InvalidationPolicyCache({
 });
 ```
 
-Let's demonstrate how we can use invalidation policies to accomplish the requirements of our `Evict-on-Write` approach above.
+Let's demonstrate how we can use invalidation policies to accomplish the requirements of our `Evict-on-write` approach above.
 
 Assuming our schema looks like this:
 
@@ -511,9 +511,9 @@ We find that this approach has a handful of advantages for data mutations:
 
 1. It centralizes the logic for invalidating the cache - developers can open up their invalidation policies and see what happens when changes are made to different types in the cache.
 2. It codifies the relationships between types - The Apollo cache is not a relational database, it doesn't know that changes to one type might effect lifecycle of another. The problem is that many clients may be dealing with highly relationald data, and tools like invalidation policies can help by adding a relational layer on top of the core cache API.
-3. It handles cases where you don't have the IDs of the entities that should be effected. In our example above, we didn't need to know that our deleted employee belonged to `Team:2`, the invalidation policy will go through all teams to look for that entity and remove them.
+3. It handles cases where you don't have the IDs of the entities that should be affected. In our example above, we didn't need to know that our deleted employee belonged to `Team:2`, the invalidation policy will go through all teams to look for that entity and remove them.
 
-> Note: If iterating through all entities like this could be a performance concern because your application has a large number of entities of a given type and frequent updates, that's definitely something to consider.
+> Note: If iterating through all entities like this could be a performance concern because your application has a large number of entities of a given type and performs frequent updates, that's definitely something to consider and test.
 
 Despite these benefits, it's still a good chunk of code and mental overhead for developers to process in order to achieve complete cache consistency and it illustrates the challenge of maintaining highly relational data on the client. Neither Redux nor Apollo Client were built expressly for managing highly relational data and if you have a solution you've found effective on your own projects I'd love to hear about it, you can find me on[Twitter](https://twitter.com/TheDerivative).
 
@@ -573,9 +573,7 @@ const analyticsLink = new ApolloLink((operation, forward) => {
 
 At first glance, this setup looks like the clear choice for replacing Redux middlewares when moving to Apollo, but it's important to call out some differences.
 
-Redux middlewares process **actions**, which are used for updating the client's state in the global Redux store.
-
-Alternatively, Apollo links process **network-bound GraphQL operations**.
+Redux middlewares process **actions**, which are used for updating the client's state in the global Redux store. Alternatively, Apollo links process **network-bound GraphQL operations**.
 
 While middlewares manage side effects at the client's state management layer, Apollo links manage side effects at the client's network layer. This means that certain things you might be doing with Redux middlewares are not doable with an equivalent Apollo link.
 
