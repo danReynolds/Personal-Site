@@ -177,11 +177,11 @@ const cache = new InMemoryCache({
   typePolicies: {
     Query: {
       employees: {
-        merge(existing, incoming, { readField, toReference }) {
+        merge(existing, incoming, { readField }) {
           return {
             ...existing,
             data: existing.data.filter(
-              employeeRef => readField('employee_age', existing) >= 18
+              employeeRef => readField('employee_age', employeeRef) >= 18
             )
           }
         }

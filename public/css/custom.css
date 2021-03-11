@@ -90,3 +90,56 @@ h1 a:hover, h2 a:hover, h3 a:hover, h4 a:hover {
 h1 a:hover::after, h2 a:hover::after, h3 a:hover::after, h4 a:hover::after {
   content: " #";
 }
+
+.related h3 a:hover::after {
+  content: none;
+}
+
+.flex-container {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: normal;
+  align-items: normal;
+  align-content: normal;
+}
+
+.flex-items:nth-child(1) {
+  display: block;
+  flex-grow: 0;
+  flex-shrink: 1;
+  flex-basis: auto;
+  align-self: auto;
+  order: 0;
+  padding: 0px 8px 0px 8px;
+}
+
+.flex-items:nth-child(2) {
+  display: block;
+  flex-grow: 0;
+  flex-shrink: 1;
+  flex-basis: auto;
+  align-self: auto;
+  padding: 0px 8px 0px 8px;
+  order: 0;
+}
+
+.flex-items:nth-child(3) {
+  display: block;
+  flex-grow: 0;
+  flex-shrink: 1;
+  flex-basis: auto;
+  padding: 0px 8px 0px 8px;
+  align-self: auto;
+  order: 0;
+}
+
+.flex-items:nth-child(4) {
+  display: block;
+  flex-grow: 0;
+  flex-shrink: 1;
+  flex-basis: auto;
+  padding: 0px 8px 0px 8px;
+  align-self: auto;
+  order: 0;
+}
