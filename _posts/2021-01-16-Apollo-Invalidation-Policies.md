@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Redux to Apollo Part 2&#58; Mutation and Side Effects
-image: '/images/tech/filter-data.jpg'
+image: '/images/tech/mutations-side-effects.jpg'
 category: Tech
 tags: [JavaScript, Apollo, GraphQL, Cache, Invalidation, Policies]
 ---
@@ -173,7 +173,7 @@ and it is represented in the cache like this:
 
 It can then be accessed in the a basic React component as shown below:
 
-```ts
+```tsx
 import React from 'react';
 import { useQuery } from '@apollo/client';
 import LoadingIndicator from './loadingIndicator';
@@ -242,11 +242,13 @@ When Charlie, the investment team manager at our company and employee number 3 i
 ```typescript
 import { gql } from '@apollo/client';
 
-mutation DeleteEmployee($employeeId: ID!) {
-  deleteEmployee(employeeId: $employeeId) {
-    success
+gql`
+  mutation DeleteEmployee($employeeId: ID!) {
+    deleteEmployee(employeeId: $employeeId) {
+      success
+    }
   }
-}
+`;
 
 const deleteEmployee = (deleteEmployeeId: string) => {
   return useMutation(DELETE_EMPLOYEE, {
@@ -320,11 +322,10 @@ Instead of leaving the dangling references in the cache, this time we'll explici
 Our update handler would then look like this:
 
 ```typescript
-
 const deleteEmployee = (deleteEmployeeId: string) => {
-  useMutation(DELETE_EMPLOYEE, {
+  return useMutation(DELETE_EMPLOYEE, {
     variables: {
-      employeeId: deletedEmployeeId',
+      employeeId: deletedEmployeeId,
     }
     update(cache) {
       // 1. Evict the employee
@@ -516,9 +517,9 @@ We find that this approach has a handful of advantages for data mutations:
 
 Despite these benefits, it's still a good chunk of code and mental overhead for developers to process in order to achieve complete cache consistency and it illustrates the challenge of maintaining highly relational data on the client. Neither Redux nor Apollo Client were built expressly for managing highly relational data and if you have a solution you've found effective on your own projects I'd love to hear about it, you can find me on[Twitter](https://twitter.com/TheDerivative).
 
-## Non-relational side-effects
+## Non-relational side effects
 
-When managing state, it is often the case that there are side-effects that need to be performed as a result of changes, such as firing analytics events or presenting users with notifications. These changes aren't codified by relationships between types, and require more flexibility so that we can support logic like *on deleting employee, fire an analytics event*.
+When managing state, it is often the case that there are side effects that need to be performed as a result of changes, such as firing analytics events or presenting users with notifications. These changes aren't codified by relationships between types, and require more flexibility so that we can support logic like *on deleting employee, fire an analytics event*.
 
 In Redux, these sort of side effects can be achieved with [middleware](https://redux.js.org/understanding/history-and-design/middleware). Redux middlewares sit between actions and reducers and can perform arbitrary side effects when an action is fired.
 
