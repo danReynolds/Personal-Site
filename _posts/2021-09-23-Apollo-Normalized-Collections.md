@@ -10,7 +10,7 @@ A guide for querying collections by type in Apollo Client.
 
 <!--halt-->
 
-## Type Policies Refresher
+## [Type Policies Refresher](#refresher)
 
 In a [past post](https://danreynolds.ca/tech/2020/11/28/Redux-To-Apollo-Accessing-Data/#canonical-fields) we explored how to create Apollo type policies to query for derived data in Apollo similarly to Redux selectors. To quickly refresh ourselves on the topic, let's walk through a quick example. We could start with a query like this:
 
@@ -296,7 +296,7 @@ The banking employees query uses our canonical field and filters it down to the 
 
 In this scenario, there isn't a single field that we can use as a canonical field for all employee entities in the cache. We could try to create one by appending to a manually synced `employees` field whenever we get back a new page or use a new `employees` type policy that aggregates the different pages together under the hood, but neither of those options are ideal since they both require a lot of developer effort to maintain and can lead to bugs.
 
-## Normalized Collections
+## [Normalized Collections](#normalized-collections)
 
 To address this problem, we eventually came up with an approach that adds normalized collections to the Apollo Cache by default in the [Apollo Cache policies](https://github.com/NerdWalletOSS/apollo-cache-policies) library.
 
@@ -366,7 +366,7 @@ In addition to the normalized `Employee` entities we saw before, there is a new 
 * `cache.readFragmentWhere`: The collection filter equivalent of the existing `cache.readFragment` API
 * `cache.watchFragmentWhere`: The collection filter equivalent of the existing `cache.watchFragment` API
 
-### useFragmentWhere
+### [useFragmentWhere](#useFragmentWhere)
 
 The `useFragmentWhere` API allows us to query for a filtered collection of entities by type. It takes two arguments, a GraphQL fragment for the fields to read from the type and an object of all the fields to filter by.
 
@@ -415,7 +415,7 @@ While `useFragmentWhere` gives us access to collections of entities in a compone
 
 Let's take a look at how we'd approach both of these scenarios with the new `readReferenceWhere` API.
 
-### Cache.readReferenceWhere
+### [Cache.readReferenceWhere](#readReferenceWhere)
 
 Normalized collections can be accessed in type policies using the new `cache.readReferenceWhere` API. `readReferenceWhere` will return a list of references for a given type and filter. Let's reconstruct our `readBankingTeam` type policy using collections:
 
@@ -470,7 +470,7 @@ const cache = new InMemoryCache({
 });
 ```
 
-## How it Works
+## [How it Works](#howitworks)
 
 Normalized collections allow us to simplify how we access and manage collections of types in the cache. While they can seem pretty magical, they are built using the existing tools available to us in Apollo Client.
 
