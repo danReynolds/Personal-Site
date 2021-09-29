@@ -269,7 +269,7 @@ The banking employees query uses our canonical field and filters it down to the 
   },
   'Employee:2': {
     __typename: 'Employee',
-    id: 1,
+    id: 2,
     name: 'Bob',
     role: 'Senior Developer',
     team: 'Investments',
@@ -344,7 +344,7 @@ const { data: employeesResponse } = useQuery(
   },
   'Employee:2': {
     __typename: 'Employee',
-    id: 1,
+    id: 2,
     name: 'Bob',
     role: 'Senior Developer',
     team: 'Investments',
