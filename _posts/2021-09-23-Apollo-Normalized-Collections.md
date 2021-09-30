@@ -25,7 +25,7 @@ query GetEmployees {
 }
 ```
 
-When this query is executed, it will store data in the Apollo cache in the following shape:
+Let's see how the Apollo cache would store the result of this query with some example data:
 
 ```js
 {
@@ -38,7 +38,7 @@ When this query is executed, it will store data in the Apollo cache in the follo
   },
   'Employee:2': {
     __typename: 'Employee',
-    id: 1,
+    id: 2,
     name: 'Bob',
     role: 'Senior Developer',
     team: 'Investments',
@@ -161,14 +161,14 @@ The `createEmployee` mutation will go create the employee in our database on the
   },
   'Employee:2': {
     __typename: 'Employee',
-    id: 1,
+    id: 2,
     name: 'Bob',
     role: 'Senior Developer',
     team: 'Investments',
   },
   'Employee:3': {
     __typename: 'Employee',
-    id: 1,
+    id: 3,
     name: 'Charlie',
   },
   ROOT_QUERY: {
@@ -226,37 +226,37 @@ Now our canonical `employees` field is kept in sync with our `createEmployee` mu
 
 While this pattern works, it puts a lot of burden on developers to keep the canonical field in sync with all the other operations that could affect the canonical collection of entities. Let's highlight some of the main problems with this approach: 
 
-1. **It causes bugs**: There may be many operations that affect the collection of entities for a type like `employees` and we would need to write manual `cache.modify` handlers for each of them to keep the field in sync. This can easily cause bugs where a developer misses updating the canonical field after a mutation, causing it to no longer reflect the complete list of entities of a type in the cache.
+1. **Easy to miss**: There may be many operations that affect the collection of entities for a type like `employees` and we would need to write manual `cache.modify` handlers for each of them to keep the field in sync. This can easily cause bugs where a developer misses updating the canonical field after a mutation, causing it to no longer reflect the complete list of entities of a type in the cache.
 
 2. **Scalability**: This approach also requires us to write **a lot** of type policies, since we would need to write one for each canonical field like we did with the `readEmployees` type policy, as well as any derived sets of data. One example data derivation would be if we wanted to read a list of employees from a certain team. The type policy for that query could look like this:
 
-```js
-const cache = new InMemoryCache({
-  typePolicies: {
-    Query: {
-      fields: {
-        readEmployees: {
-          read(employees, { readField }) {
-            return readField('employees')?.data ?? [];
+  ```js
+  const cache = new InMemoryCache({
+    typePolicies: {
+      Query: {
+        fields: {
+          readEmployees: {
+            read(employees, { readField }) {
+              return readField('employees')?.data ?? [];
+            },
           },
-        },
-        readBankingTeam: {
-          read(_existingBankingTeam, { readField }) {
-            return readField('readEmployees').filter(employeeRef => {
-              const employeeTeam = readField('team', employeeRef);
-              return employeeTeam === 'Banking';
-            });
-          }
+          readBankingTeam: {
+            read(_existingBankingTeam, { readField }) {
+              return readField('readEmployees').filter(employeeRef => {
+                const employeeTeam = readField('team', employeeRef);
+                return employeeTeam === 'Banking';
+              });
+            }
+          },
         },
       },
     },
-  },
-});
-```
+  });
+  ```
 
-The banking employees query uses our canonical field and filters it down to the matching set of employees. While this works, having to manually write a new type policy every time we want to filter our collections can bloat our codebase over time.
+  The banking employees query uses our canonical field and filters it down to the matching set of employees. While this works, having to manually write a new type policy every   time we want to filter our collections can bloat our codebase over time.
 
-3. **Assumes there is a canonical field**: It might be the case that there actually isn't a single query like `employees` that we can use as our canonical field. For instance, if the query for the list of employees is paginated, each page would be stored under separate fields on the root query like this:
+3. **Assumes a canonical field exists**: It might be the case that there actually isn't a single query like `employees` that we can use as our canonical field. For instance, if the query for the list of employees is paginated, each page would be stored under separate fields on the root query like this:
 
 ```js
 {
@@ -269,10 +269,24 @@ The banking employees query uses our canonical field and filters it down to the 
   },
   'Employee:2': {
     __typename: 'Employee',
-    id: 1,
+    id: 2,
     name: 'Bob',
     role: 'Senior Developer',
     team: 'Investments',
+  },
+  'Employee:3': {
+    __typename: 'Employee',
+    id: 3,
+    name: 'Charlie',
+    role: 'Senior Developer',
+    team: 'Banking',
+  },
+  'Employee:4': {
+    __typename: 'Employee',
+    id: 4,
+    name: 'Dan',
+    role: 'Junior Developer',
+    team: 'Mobile',
   },
   ...
   ROOT_QUERY: {
@@ -344,7 +358,7 @@ const { data: employeesResponse } = useQuery(
   },
   'Employee:2': {
     __typename: 'Employee',
-    id: 1,
+    id: 2,
     name: 'Bob',
     role: 'Senior Developer',
     team: 'Investments',
@@ -388,7 +402,7 @@ const { data } = useFragmentWhere(
 )
 ```
 
-If we just want to retrieve all entities in the cache for a particular type, we can omit the filter altogether:
+If we just want to retrieve all entities in the cache of a particular type, we can omit the filter altogether:
 
 ```js
 import { useFragmentWhere } from '@nerdwallet/apollo-cache-policies';
@@ -495,7 +509,7 @@ if (!policies.getFieldPolicy('Query', fragmentName)) {
 }
 ```
 
-It then uses the `readReferenceWhere` we looked at earlier to retrieve the list of matching references for your filter. Since it's a type policy just like the normal ones we write, it can be queried for like any other field.
+It then uses the `readReferenceWhere` API we looked at earlier to retrieve the list of matching references for your filter. Since it's a type policy just like the normal ones we write, it can be queried for like any other field.
 
 Once a new type policy has been added, it then generates a query for that field and calls  `useQuery` to subscribe to the query:
 
