@@ -1,3 +1,1 @@
-# Based on Lanyon Jekyll Theme
-
-Contains my blog and experience.
+Contains my blog and experience. To run on a new system, you need to decrypt the env variables by first setting the decryption key as the ENV_KEY environment variable and running `./deploymanager "rake secrets:decrypt"`
