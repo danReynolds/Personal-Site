@@ -1,0 +1,27 @@
+#####################################
+# 1. BUILD STAGE (Ruby + Jekyll)
+#####################################
+FROM danreynolds/blog-builder:1.0 AS builder
+
+# Copy your entire Jekyll site into /app
+COPY . /app
+
+# Set environment variable
+ENV JEKYLL_ENV=production
+
+# Build the site into the _site folder
+RUN jekyll build --verbose
+
+#####################################
+# 2. RUN STAGE (Nginx to serve static)
+#####################################
+FROM nginx:alpine
+
+# Copy the generated site from the builder stage
+COPY --from=builder /app/_site/ /usr/share/nginx/html
+
+# Expose port 80
+EXPOSE 80
+
+# Nginx will automatically serve files from /usr/share/nginx/html
+CMD ["nginx", "-g", "daemon off;"]
