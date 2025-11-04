@@ -1,9 +1,0 @@
-hub_account: danreynolds
-app_name: danreynolds.ca
-remote_path: /home/deploy/docker/danReynolds.ca
-dockerfile: Dockerfile
-remote_files:
-  - docker-compose.yml
-  - docker-compose.production.yml
-  - nginx.conf
-  - nginx.upstream.conf
